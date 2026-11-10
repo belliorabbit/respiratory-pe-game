@@ -907,10 +907,243 @@
                       </div>
                     </div>
                     
-                    {profTab === 'diseases' && (
-                      <div className="text-center py-10 bg-[#FFF5F5] border-2 border-[#5A3825] rounded-2xl">
-                        <p className="font-bold text-[#5A3825] mb-2">Professor editing is functional but simplified in this HTML view.</p>
-                        <p className="text-xs text-[#8C584C]">To edit the 10 diseases or findings permanently, edit the <code>DEFAULT_DISEASES</code> block directly inside the downloaded index.html file.</p>
+                    {profTab === 'diseases' && editingDisease && (
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <label className="text-xs font-bold">Select Disease to Edit:</label>
+                            <select
+                              value={editingDisease.id}
+                              onChange={(e) => setEditingDiseaseId(e.target.value)}
+                              className="border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs font-bold bg-[#FFF5F5]"
+                            >
+                              {diseases.map((d) => (
+                                <option key={d.id} value={d.id}>
+                                  {d.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <form onSubmit={handleAddNewDisease} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={newDiseaseName}
+                              onChange={(e) => setNewDiseaseName(e.target.value)}
+                              placeholder="New disease name..."
+                              className="border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs"
+                            />
+                            <button
+                              type="submit"
+                              className="bg-[#38A169] text-white text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]"
+                            >
+                              + Add Disease
+                            </button>
+                          </form>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#FFF5F5] p-4 rounded-2xl border-2 border-[#5A3825]">
+                          <div className="space-y-2.5">
+                            <div>
+                              <label className="block text-xs font-bold">Disease Title:</label>
+                              <input
+                                type="text"
+                                value={editingDisease.name}
+                                onChange={(e) =>
+                                  handleUpdateDiseaseField(editingDisease.id, 'name', e.target.value)
+                                }
+                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs font-bold"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold">Short Subtitle / Mechanism Tag:</label>
+                              <input
+                                type="text"
+                                value={editingDisease.shortTag}
+                                onChange={(e) =>
+                                  handleUpdateDiseaseField(editingDisease.id, 'shortTag', e.target.value)
+                                }
+                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold">Built-in Kawaii Graphic Preset:</label>
+                              <select
+                                value={editingDisease.graphicType}
+                                onChange={(e) =>
+                                  handleUpdateDiseaseField(editingDisease.id, 'graphicType', e.target.value)
+                                }
+                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs bg-white"
+                              >
+                                <option value="consolidation_left">Left Lower Lung Consolidation</option>
+                                <option value="consolidation_right_upper">Right Upper Lung Consolidation</option>
+                                <option value="pneumothorax_right">Right Tension Pneumothorax</option>
+                                <option value="pneumothorax_left">Left Tension Pneumothorax</option>
+                                <option value="effusion_left">Massive Left Pleural Effusion</option>
+                                <option value="effusion_right_mod">Right Pleural Effusion (Moderate)</option>
+                                <option value="edema_bilat">Bilateral Pulmonary Edema</option>
+                                <option value="asthma_severe">Severe Asthmatic Attack</option>
+                                <option value="atelectasis_lul">Left Upper Lobe Atelectasis</option>
+                                <option value="atelectasis_rll">Right Lower Lobe Atelectasis</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold">
+                                Custom Image URL or Upload PNG/JPG (Overrides Preset):
+                              </label>
+                              <input
+                                type="text"
+                                value={editingDisease.customImageUrl || ''}
+                                onChange={(e) =>
+                                  handleUpdateDiseaseField(editingDisease.id, 'customImageUrl', e.target.value)
+                                }
+                                placeholder="Paste image URL or upload file below..."
+                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1 text-xs mb-1"
+                              />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageFileUpload(editingDisease.id, e)}
+                                className="text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold">Pathophysiology Explanation:</label>
+                              <textarea
+                                rows={3}
+                                value={editingDisease.pathophysiology}
+                                onChange={(e) =>
+                                  handleUpdateDiseaseField(editingDisease.id, 'pathophysiology', e.target.value)
+                                }
+                                className="w-full border-2 border-[#5A3825] rounded-xl p-2 text-xs"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Mode 2 IPPA Table Text Editor */}
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-bold text-[#C85A5A] uppercase">
+                              Mode 2 IPPA Table Text for {editingDisease.name}:
+                            </h4>
+                            {['inspection', 'palpation_trachea', 'palpation_expansion', 'palpation_fremitus', 'percussion', 'auscultation_breath', 'auscultation_vocal'].map((step) => (
+                              <div key={step}>
+                                <label className="block text-[11px] font-bold capitalize">{step.replace('_', ' ')}:</label>
+                                <input
+                                  type="text"
+                                  value={editingDisease.ippaTable?.[step] || ''}
+                                  onChange={(e) =>
+                                    handleUpdateIppaField(editingDisease.id, step, e.target.value)
+                                  }
+                                  className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Checkboxes to link Mode 1 Finding Cards to this Disease */}
+                        <div className="bg-[#FFFDF9] border-2 border-[#5A3825] rounded-2xl p-4">
+                          <h4 className="text-xs font-bold text-[#C85A5A] uppercase mb-2">
+                            Mode 1 Answer Key — Check All Correct Finding Cards for {editingDisease.name}:
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1">
+                            {findings.map((f) => {
+                              const checked = editingDisease.findingIds.includes(f.id);
+                              return (
+                                <label
+                                  key={f.id}
+                                  className={`flex items-start gap-2 p-2 rounded-xl border text-xs cursor-pointer ${
+                                    checked
+                                      ? 'bg-[#F0FFF4] border-[#38A169] font-bold'
+                                      : 'bg-white border-gray-300'
+                                  }`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => handleToggleFindingForDisease(editingDisease.id, f.id)}
+                                    className="mt-0.5"
+                                  />
+                                  <span>
+                                    <strong className="text-[#C85A5A]">[{f.category}]</strong> {f.title}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TAB 2: ADD / EDIT FINDINGS POOL */}
+                    {profTab === 'findings' && (
+                      <div className="space-y-4">
+                        <form
+                          onSubmit={handleAddFinding}
+                          className="bg-[#FFF5F5] border-2 border-[#5A3825] rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3"
+                        >
+                          <div>
+                            <label className="block text-xs font-bold">Category (Icon):</label>
+                            <select
+                              value={newFinding.category}
+                              onChange={(e) =>
+                                setNewFinding((prev) => ({ ...prev, category: e.target.value }))
+                              }
+                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs bg-white"
+                            >
+                              <option value="Inspection">👁️ Inspection</option>
+                              <option value="Palpation">✋ Palpation</option>
+                              <option value="Percussion">👆 Percussion</option>
+                              <option value="Auscultation">🩺 Auscultation</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold">Card Title:</label>
+                            <input
+                              type="text"
+                              value={newFinding.title}
+                              onChange={(e) =>
+                                setNewFinding((prev) => ({ ...prev, title: e.target.value }))
+                              }
+                              placeholder="e.g. Egophony (E-to-A)"
+                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold">Short Subtitle:</label>
+                            <input
+                              type="text"
+                              value={newFinding.subtitle}
+                              onChange={(e) =>
+                                setNewFinding((prev) => ({ ...prev, subtitle: e.target.value }))
+                              }
+                              placeholder="Heard over consolidated lung"
+                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs"
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <button
+                              type="submit"
+                              className="w-full bg-[#38A169] text-white font-bold text-xs py-2 rounded-xl border-2 border-[#5A3825]"
+                            >
+                              + Add New Finding Card
+                            </button>
+                          </div>
+                        </form>
+
+                        <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
+                          {findings.map((f) => (
+                            <div
+                              key={f.id}
+                              className="flex items-center justify-between bg-white border-2 border-[#5A3825] rounded-xl px-3 py-2 text-xs"
+                            >
+                              <div>
+                                <span className="font-bold text-[#C85A5A]">[{f.category}]</span>{' '}
+                                <strong>{f.title}</strong> — <span className="text-[#8C584C]">{f.subtitle}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
