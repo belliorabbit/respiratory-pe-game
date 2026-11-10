@@ -6,47 +6,25 @@
   <title>Respiratory System Physical Examination — Year 1 Med Game</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Fredoka & Quicksand for the cute study guide theme -->
+  <!-- Google Fonts: Fredoka & Quicksand -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- React & ReactDOM (Production) -->
+  <!-- React & ReactDOM -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel Standalone for in-browser JSX compilation -->
+  <!-- Babel -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    body {
-      font-family: 'Quicksand', sans-serif;
-      background-color: #FDF0F0;
-      color: #5A3825;
-      margin: 0;
-      padding: 0;
-    }
-    h1, h2, h3, .font-display {
-      font-family: 'Fredoka', sans-serif;
-    }
-    .kawaii-shadow {
-      box-shadow: 0 5px 0 #5A3825;
-    }
-    .kawaii-shadow-sm {
-      box-shadow: 0 3px 0 #5A3825;
-    }
-    .kawaii-card-correct {
-      border-color: #68D391 !important;
-      background-color: #F0FFF4 !important;
-      box-shadow: 0 5px 0 #38A169 !important;
-    }
-    .kawaii-card-wrong {
-      border-color: #9B2C2C !important;
-      background-color: #FFF5F5 !important;
-      box-shadow: 0 5px 0 #742A2A !important;
-    }
-    @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
-    }
-    .animate-float {
-      animation: floatSlow 3s ease-in-out infinite;
-    }
+    body { font-family: 'Quicksand', sans-serif; background-color: #FDF0F0; color: #5A3825; margin: 0; padding: 0; }
+    h1, h2, h3, h4, .font-display { font-family: 'Fredoka', sans-serif; }
+    .kawaii-shadow { box-shadow: 0 5px 0 #5A3825; }
+    .kawaii-shadow-sm { box-shadow: 0 3px 0 #5A3825; }
+    .kawaii-card-correct { border-color: #68D391 !important; background-color: #F0FFF4 !important; box-shadow: 0 5px 0 #38A169 !important; }
+    .kawaii-card-wrong { border-color: #9B2C2C !important; background-color: #FFF5F5 !important; box-shadow: 0 5px 0 #742A2A !important; }
+    @keyframes floatSlow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+    .animate-float { animation: floatSlow 3s ease-in-out infinite; }
+    /* Hide scrollbar for cleaner UI but keep functionality */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body>
@@ -56,311 +34,253 @@
     const { useState, useEffect, useMemo } = React;
 
     // ==========================================
-    // DEFAULT CLINICAL DATABASE (Mode 1 & Mode 2)
+    // 10-DISEASE CLINICAL DATABASE 
     // ==========================================
     const DEFAULT_FINDINGS = [
       // Inspection
-      {
-        id: 'insp_asym_left',
-        category: 'Inspection',
-        title: 'Reduced Left Chest Wall Movement',
-        subtitle: 'Asymmetric lag on the left side during inspiration',
-        rationale: 'Pathology in the left hemithorax (consolidation or large pleural effusion) restricts ipsilateral lung expansion.'
-      },
-      {
-        id: 'insp_asym_right',
-        category: 'Inspection',
-        title: 'Reduced Right Chest Wall Movement',
-        subtitle: 'Asymmetric lag on the right side with respiratory distress',
-        rationale: 'High-pressure air trapped in the right pleural space collapses the right lung and prevents normal chest wall excursion.'
-      },
-      {
-        id: 'insp_hyperinflation',
-        category: 'Inspection',
-        title: 'Accessory Muscle Use & Hyperinflation',
-        subtitle: 'Barrel-shaped chest with sternocleidomastoid / intercostal retractions',
-        rationale: 'Severe bronchospasm traps air during expiration, forcing lungs to operate at high volumes and requiring accessory muscles.'
-      },
-      {
-        id: 'insp_tachypnea_sym',
-        category: 'Inspection',
-        title: 'Tachypnea with Symmetric Movement',
-        subtitle: 'Rapid breathing but equal bilateral chest movement',
-        rationale: 'Diffuse alveolar fluid impairs gas exchange across both lungs equally, stimulating tachypnea without unilateral asymmetry.'
-      },
+      { id: 'insp_asym_left', category: 'Inspection', title: 'Reduced Left Chest Wall Movement', subtitle: 'Asymmetric lag on the left', rationale: 'Pathology in the left hemithorax restricts ipsilateral lung expansion.' },
+      { id: 'insp_asym_right', category: 'Inspection', title: 'Reduced Right Chest Wall Movement', subtitle: 'Asymmetric lag on the right', rationale: 'Pathology in the right hemithorax prevents normal chest wall excursion.' },
+      { id: 'insp_hyperinflation', category: 'Inspection', title: 'Accessory Muscle Use & Hyperinflation', subtitle: 'Barrel-shaped chest', rationale: 'Severe bronchospasm traps air during expiration, requiring accessory muscles.' },
+      { id: 'insp_tachypnea_sym', category: 'Inspection', title: 'Tachypnea with Symmetric Movement', subtitle: 'Rapid breathing, equal movement', rationale: 'Diffuse alveolar fluid impairs gas exchange across both lungs equally.' },
+      { id: 'insp_asym_left_upper', category: 'Inspection', title: 'Reduced Left Upper Chest Movement', subtitle: 'Lag over left upper zone', rationale: 'Volume loss or pathology localized to the left upper lobe.' },
+      { id: 'insp_asym_right_lower', category: 'Inspection', title: 'Reduced Right Lower Chest Movement', subtitle: 'Lag over right lower zone', rationale: 'Volume loss or pathology localized to the right lower lobe.' },
+      { id: 'insp_asym_right_upper', category: 'Inspection', title: 'Reduced Right Upper Chest Movement', subtitle: 'Lag over right upper zone', rationale: 'Pathology localized to the right upper lobe restricts expansion.' },
 
-      // Palpation
-      {
-        id: 'palp_trachea_midline',
-        category: 'Palpation',
-        title: 'Normal Midline Trachea',
-        subtitle: 'No mediastinal shift (Normal finding)',
-        rationale: 'Alveolar consolidation, bilateral pulmonary edema, and asthma do not create unilateral pleural pressure gradients, so the trachea stays midline.'
-      },
-      {
-        id: 'palp_trachea_left',
-        category: 'Palpation',
-        title: 'Trachea Shift to the Left',
-        subtitle: 'Mediastinum pushed toward the left side',
-        rationale: 'In a Right Tension Pneumothorax, positive pressure builds up in the right pleural space and pushes the trachea contralaterally to the left.'
-      },
-      {
-        id: 'palp_trachea_right',
-        category: 'Palpation',
-        title: 'Trachea Shift to the Right',
-        subtitle: 'Mediastinum pushed toward the right side',
-        rationale: 'In a Massive Left Pleural Effusion, large fluid volume in the left pleural space pushes the mediastinum and trachea away to the right.'
-      },
-      {
-        id: 'palp_exp_dec_left',
-        category: 'Palpation',
-        title: 'Decreased Left Chest Expansion',
-        subtitle: 'Left thumb moves less than right on deep inspiration',
-        rationale: 'Left consolidation or massive left effusion reduces compliance and volume entry into the left hemithorax.'
-      },
-      {
-        id: 'palp_exp_dec_right',
-        category: 'Palpation',
-        title: 'Decreased Right Chest Expansion',
-        subtitle: 'Right thumb moves less than left on deep inspiration',
-        rationale: 'Right tension pneumothorax collapses the right lung, markedly reducing right-sided expansion.'
-      },
-      {
-        id: 'palp_frem_inc_left',
-        category: 'Palpation',
-        title: 'Increased Left Tactile Fremitus',
-        subtitle: 'Stronger "99" vibrations felt over left lower lung',
-        rationale: 'Fluid/exudate-filled alveoli in consolidation conduct low-frequency vocal vibrations much better than air-filled alveoli (provided the bronchus is patent).'
-      },
-      {
-        id: 'palp_frem_dec_left',
-        category: 'Palpation',
-        title: 'Decreased Left Tactile Fremitus',
-        subtitle: 'Dampened or absent vibrations over the left lung',
-        rationale: 'Fluid in the pleural space separates the lung parenchyma from the chest wall, creating an acoustic barrier that dampens tactile fremitus.'
-      },
-      {
-        id: 'palp_frem_dec_right',
-        category: 'Palpation',
-        title: 'Decreased Right Tactile Fremitus',
-        subtitle: 'Absent vibrations over the right hemithorax',
-        rationale: 'Air trapped in the right pleural space insulates sound transmission from the collapsed right lung to the chest wall.'
-      },
+      // Palpation - Trachea
+      { id: 'palp_trachea_midline', category: 'Palpation', title: 'Normal Midline Trachea', subtitle: 'No mediastinal shift', rationale: 'Conditions like consolidation, moderate effusion, edema, and asthma do not create massive unilateral pressure gradients.' },
+      { id: 'palp_trachea_left_push', category: 'Palpation', title: 'Trachea Shift to the Left', subtitle: 'Pushed away from right', rationale: 'Positive pressure in a right tension pneumothorax pushes the mediastinum to the left.' },
+      { id: 'palp_trachea_left_pull', category: 'Palpation', title: 'Trachea Shift to the Left (Pulled)', subtitle: 'Pulled toward the left', rationale: 'Volume loss from left upper lobe atelectasis pulls the trachea ipsilaterally.' },
+      { id: 'palp_trachea_right_push', category: 'Palpation', title: 'Trachea Shift to the Right', subtitle: 'Pushed away from left', rationale: 'Massive left pleural effusion or left tension PTX pushes the mediastinum to the right.' },
+      { id: 'palp_trachea_right_pull', category: 'Palpation', title: 'Trachea Shift to the Right (Pulled)', subtitle: 'Pulled toward the right', rationale: 'Volume loss from right lower lobe atelectasis pulls the trachea ipsilaterally.' },
+      
+      // Palpation - Expansion
+      { id: 'palp_exp_dec_left', category: 'Palpation', title: 'Decreased Left Chest Expansion', subtitle: 'Left thumb moves less', rationale: 'Left-sided pathology reduces compliance and volume entry.' },
+      { id: 'palp_exp_dec_right', category: 'Palpation', title: 'Decreased Right Chest Expansion', subtitle: 'Right thumb moves less', rationale: 'Right-sided pathology collapses or restricts the right lung.' },
+      
+      // Palpation - Fremitus (Lobe/Zone Specific)
+      { id: 'palp_frem_inc_lll', category: 'Palpation', title: 'Increased Left Lower Tactile Fremitus', subtitle: 'Stronger vibrations left lower', rationale: 'Solidified alveolar exudate conducts vibrations better than air.' },
+      { id: 'palp_frem_inc_rul', category: 'Palpation', title: 'Increased Right Upper Tactile Fremitus', subtitle: 'Stronger vibrations right upper', rationale: 'Solidified exudate in the right upper lobe conducts sound efficiently.' },
+      { id: 'palp_frem_dec_right', category: 'Palpation', title: 'Decreased Right Tactile Fremitus', subtitle: 'Absent vibrations right chest', rationale: 'Pleural air or fluid insulates sound transmission to the chest wall.' },
+      { id: 'palp_frem_dec_left', category: 'Palpation', title: 'Decreased Left Tactile Fremitus', subtitle: 'Absent vibrations left chest', rationale: 'Pleural air or fluid insulates sound transmission.' },
+      { id: 'palp_frem_dec_lul', category: 'Palpation', title: 'Decreased Left Upper Tactile Fremitus', subtitle: 'Absent vibrations left upper', rationale: 'Obstructed left upper bronchus prevents sound waves from reaching the chest wall.' },
+      { id: 'palp_frem_dec_rll', category: 'Palpation', title: 'Decreased Right Lower Tactile Fremitus', subtitle: 'Absent vibrations right lower', rationale: 'Obstructed right lower bronchus blocks vibration transmission.' },
 
       // Percussion
-      {
-        id: 'perc_dull_left',
-        category: 'Percussion',
-        title: 'Left Dullness on Percussion',
-        subtitle: 'Dull / stony dull note over the left chest',
-        rationale: 'Replacing normal air-filled lung with dense alveolar exudate (consolidation) or pleural fluid (effusion) produces a dull or stony dull percussion note.'
-      },
-      {
-        id: 'perc_tympanic_right',
-        category: 'Percussion',
-        title: 'Right Hyperresonant / Tympanic Percussion',
-        subtitle: 'Hollow drum-like sound over the right chest',
-        rationale: 'A large pocket of free air under tension in the right pleural cavity vibrates loudly on percussion, creating hyperresonance or tympany.'
-      },
-      {
-        id: 'perc_normal_bilat',
-        category: 'Percussion',
-        title: 'Normal Resonance on Percussion',
-        subtitle: 'Normal resonant note bilaterally (Normal finding)',
-        rationale: 'In interstitial/early bilateral pulmonary edema or mild-to-moderate asthma, air remains the predominant medium on percussion.'
-      },
-      {
-        id: 'perc_hyper_bilat',
-        category: 'Percussion',
-        title: 'Normal / Diffuse Hyperresonance',
-        subtitle: 'Bilateral resonant to hyperresonant note across both lungs',
-        rationale: 'Diffuse air trapping in severe asthma increases functional residual capacity, keeping percussion normal or bilaterally hyperresonant.'
-      },
+      { id: 'perc_dull_lll', category: 'Percussion', title: 'Left Lower Dullness on Percussion', subtitle: 'Dull note left lower zone', rationale: 'Consolidated exudate replaces air, producing a dull note.' },
+      { id: 'perc_dull_rul', category: 'Percussion', title: 'Right Upper Dullness on Percussion', subtitle: 'Dull note right upper zone', rationale: 'Consolidated exudate in the right upper lobe produces dullness.' },
+      { id: 'perc_dull_lul', category: 'Percussion', title: 'Left Upper Dullness on Percussion', subtitle: 'Dull note left upper zone', rationale: 'Collapsed, airless lung tissue in atelectasis percusses dull.' },
+      { id: 'perc_dull_rll', category: 'Percussion', title: 'Right Lower Dullness on Percussion', subtitle: 'Dull note right lower zone', rationale: 'Collapsed right lower lobe tissue percusses dull.' },
+      { id: 'perc_stony_left', category: 'Percussion', title: 'Left Stony Dullness on Percussion', subtitle: 'Extremely dull left chest', rationale: 'Dense pleural fluid creates a distinctively flat, stony dull note.' },
+      { id: 'perc_stony_right', category: 'Percussion', title: 'Right Stony Dullness on Percussion', subtitle: 'Extremely dull right chest', rationale: 'Pleural fluid in the right hemithorax produces stony dullness.' },
+      { id: 'perc_tympanic_right', category: 'Percussion', title: 'Right Hyperresonant / Tympanic', subtitle: 'Hollow drum-like sound right', rationale: 'Trapped pleural air under tension vibrates loudly.' },
+      { id: 'perc_tympanic_left', category: 'Percussion', title: 'Left Hyperresonant / Tympanic', subtitle: 'Hollow drum-like sound left', rationale: 'Trapped pleural air in the left hemithorax vibrates loudly.' },
+      { id: 'perc_normal_bilat', category: 'Percussion', title: 'Normal Resonance on Percussion', subtitle: 'Normal note bilaterally', rationale: 'Air remains the predominant medium in interstitial edema or mild asthma.' },
+      { id: 'perc_hyper_bilat', category: 'Percussion', title: 'Normal / Diffuse Hyperresonance', subtitle: 'Resonant to hyperresonant', rationale: 'Diffuse air trapping increases functional residual capacity.' },
 
       // Auscultation
-      {
-        id: 'ausc_bronchial_left',
-        category: 'Auscultation',
-        title: 'Left Bronchial Breath Sounds & Crackles',
-        subtitle: 'Harsh tubular sounds + coarse crackles over left lower lobe',
-        rationale: 'Consolidated lung transmits high-frequency turbulent tracheobronchial sounds directly to the periphery without alveolar air filtering.'
-      },
-      {
-        id: 'ausc_vr_inc_left',
-        category: 'Auscultation',
-        title: 'Increased Left Vocal Resonance',
-        subtitle: 'Loud, clear spoken voice ("99") over left lower lung',
-        rationale: 'Solidified alveolar tissue in left lower lobe consolidation enhances transmission of spoken voice sounds through the chest wall.'
-      },
-      {
-        id: 'ausc_absent_right',
-        category: 'Auscultation',
-        title: 'Absent Breath Sounds on Right',
-        subtitle: 'Silent right hemithorax on auscultation',
-        rationale: 'In right tension pneumothorax, the right lung is collapsed and pleural air blocks sound transmission.'
-      },
-      {
-        id: 'ausc_vr_dec_right',
-        category: 'Auscultation',
-        title: 'Decreased Right Vocal Resonance',
-        subtitle: 'Muffled or absent voice sounds over right chest',
-        rationale: 'Pleural air in right pneumothorax reflects and insulates acoustic energy from the airways.'
-      },
-      {
-        id: 'ausc_dec_left',
-        category: 'Auscultation',
-        title: 'Decreased / Absent Breath Sounds Left Lung',
-        subtitle: 'Diminished breath sounds over the left fluid zone',
-        rationale: 'Pleural fluid compresses the underlying left lung and blocks breath sound transmission to the stethoscope.'
-      },
-      {
-        id: 'ausc_vr_dec_left',
-        category: 'Auscultation',
-        title: 'Decreased Left Vocal Resonance',
-        subtitle: 'Muffled spoken voice over the left chest',
-        rationale: 'Fluid in the left pleural space acts as an acoustic insulator between the bronchial tree and the stethoscope.'
-      },
-      {
-        id: 'ausc_fine_crep_bilat',
-        category: 'Auscultation',
-        title: 'Bilateral Fine Late-Inspiratory Crepitations',
-        subtitle: 'Fine basal crackles heard symmetrically in both lungs',
-        rationale: 'Edema fluid causes small distal airways and alveoli at the lung bases to snap open during late inspiration.'
-      },
-      {
-        id: 'ausc_wheeze_bilat',
-        category: 'Auscultation',
-        title: 'Bilateral Expiratory Wheezing',
-        subtitle: 'High-pitched musical polyphonic wheezes bilaterally',
-        rationale: 'Airflow through diffusely narrowed, bronchospastic and edematous small airways creates musical oscillations during expiration.'
-      },
-      {
-        id: 'ausc_silent_chest',
-        category: 'Auscultation',
-        title: 'Silent Chest (Life-Threatening Asthma)',
-        subtitle: 'Critically reduced airflow with absent wheezing',
-        rationale: 'When bronchospasm and mucus plugging become critical, airflow velocity drops too low to generate audible wheezes—an ominous sign!'
-      }
+      { id: 'ausc_bronchial_lll', category: 'Auscultation', title: 'Left Lower Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds left lower', rationale: 'Patent airways surrounded by solid exudate transmit harsh tracheal sounds directly.' },
+      { id: 'ausc_vr_inc_lll', category: 'Auscultation', title: 'Increased Left Lower Vocal Resonance', subtitle: 'Loud voice sounds left lower', rationale: 'Solidified tissue enhances sound transmission.' },
+      { id: 'ausc_bronchial_rul', category: 'Auscultation', title: 'Right Upper Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds right upper', rationale: 'Consolidated right upper lobe transmits sounds directly from patent bronchi.' },
+      { id: 'ausc_vr_inc_rul', category: 'Auscultation', title: 'Increased Right Upper Vocal Resonance', subtitle: 'Loud voice sounds right upper', rationale: 'Consolidation enhances voice sound transmission.' },
+      
+      { id: 'ausc_absent_right', category: 'Auscultation', title: 'Absent Breath Sounds on Right', subtitle: 'Silent right hemithorax', rationale: 'Pleural air/fluid insulates sound, or the lung is collapsed.' },
+      { id: 'ausc_vr_dec_right', category: 'Auscultation', title: 'Decreased Right Vocal Resonance', subtitle: 'Muffled sounds right chest', rationale: 'Pleural air/fluid acts as an acoustic barrier.' },
+      { id: 'ausc_absent_left', category: 'Auscultation', title: 'Decreased / Absent Breath Sounds on Left', subtitle: 'Silent left hemithorax', rationale: 'Pleural fluid/air compresses the lung and blocks sound.' },
+      { id: 'ausc_vr_dec_left', category: 'Auscultation', title: 'Decreased Left Vocal Resonance', subtitle: 'Muffled sounds left chest', rationale: 'Pleural fluid/air insulates acoustic energy.' },
+      
+      { id: 'ausc_absent_lul', category: 'Auscultation', title: 'Decreased / Absent Left Upper Breath Sounds', subtitle: 'Diminished sounds left upper', rationale: 'An obstructed bronchus prevents air entry and breath sound generation.' },
+      { id: 'ausc_vr_dec_lul', category: 'Auscultation', title: 'Decreased Left Upper Vocal Resonance', subtitle: 'Muffled left upper zone', rationale: 'Blocked airway prevents vocal sound transmission to the lobe.' },
+      { id: 'ausc_absent_rll', category: 'Auscultation', title: 'Decreased / Absent Right Lower Breath Sounds', subtitle: 'Diminished sounds right lower', rationale: 'Obstructed right lower bronchus halts airflow and sound.' },
+      { id: 'ausc_vr_dec_rll', category: 'Auscultation', title: 'Decreased Right Lower Vocal Resonance', subtitle: 'Muffled right lower zone', rationale: 'Bronchial occlusion blocks sound transmission.' },
+
+      { id: 'ausc_fine_crep_bilat', category: 'Auscultation', title: 'Bilateral Fine Late-Inspiratory Crepitations', subtitle: 'Fine basal crackles', rationale: 'Edematous distal airways snap open during late inspiration.' },
+      { id: 'ausc_wheeze_bilat', category: 'Auscultation', title: 'Bilateral Expiratory Wheezing', subtitle: 'High-pitched musical wheezes', rationale: 'Airflow through diffusely narrowed small airways creates oscillations.' },
+      { id: 'ausc_silent_chest', category: 'Auscultation', title: 'Silent Chest (Life-Threatening Asthma)', subtitle: 'Absent wheezing / airflow', rationale: 'Airflow velocity drops too low to generate audible sounds due to critical obstruction.' }
     ];
 
     const DEFAULT_DISEASES = [
       {
         id: 'consolidation_lll',
-        name: 'Left Lower Lung Consolidation',
-        shortTag: 'Alveolar Exudate (Lobar Pneumonia)',
+        name: 'Left Lower Lung Consolidation from Pneumonia',
+        shortTag: 'Lobar Pneumonia (Left Lower)',
         graphicType: 'consolidation_left',
-        customImageUrl: '',
         pathophysiology: 'Alveoli in the left lower lobe fill with inflammatory exudate (fluid, WBCs, fibrin) while the conducting airways remain patent. Solidified parenchyma conducts sound waves and vibrations much better than spongy air-filled alveoli, without shifting the mediastinum.',
-        findingIds: [
-          'palp_trachea_midline',
-          'palp_exp_dec_left',
-          'palp_frem_inc_left',
-          'perc_dull_left',
-          'ausc_bronchial_left',
-          'ausc_vr_inc_left'
-        ],
+        findingIds: ['palp_trachea_midline', 'palp_exp_dec_left', 'palp_frem_inc_lll', 'perc_dull_lll', 'ausc_bronchial_lll', 'ausc_vr_inc_lll'],
         ippaTable: {
-          inspection: 'Asymmetric chest wall movement (lag on left) or normal',
-          palpation: 'Trachea midline (NORMAL); Decreased left chest expansion; INCREASED left tactile fremitus',
-          percussion: 'DULLNESS over left lower lung zone',
-          auscultation: 'BRONCHIAL breath sounds & coarse crackles on left; INCREASED left vocal resonance'
+          inspection: 'Reduced left chest wall movement (or normal)',
+          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_expansion: 'Decreased left chest expansion',
+          palpation_fremitus: 'INCREASED left tactile fremitus',
+          percussion: 'DULLNESS on left percussion',
+          auscultation_breath: 'BRONCHIAL breath sounds & coarse crackles on left',
+          auscultation_vocal: 'INCREASED left vocal resonance'
+        }
+      },
+      {
+        id: 'consolidation_rul',
+        name: 'Right Upper Lung Consolidation from Pneumonia',
+        shortTag: 'Lobar Pneumonia (Right Upper)',
+        graphicType: 'consolidation_right_upper',
+        pathophysiology: 'Alveoli in the right upper lobe fill with inflammatory exudate around a patent bronchus, enhancing vocal vibration and transmitting harsh bronchial breath sounds to the right upper chest wall while keeping the trachea midline.',
+        findingIds: ['palp_trachea_midline', 'palp_exp_dec_right', 'palp_frem_inc_rul', 'perc_dull_rul', 'ausc_bronchial_rul', 'ausc_vr_inc_rul'],
+        ippaTable: {
+          inspection: 'Reduced right chest wall movement (or normal)',
+          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_expansion: 'Decreased right chest expansion',
+          palpation_fremitus: 'INCREASED right tactile fremitus',
+          percussion: 'DULLNESS on right percussion',
+          auscultation_breath: 'BRONCHIAL breath sounds & coarse crackles on right',
+          auscultation_vocal: 'INCREASED right vocal resonance'
         }
       },
       {
         id: 'tension_ptx_right',
         name: 'Right Tension Pneumothorax',
-        shortTag: 'One-Way Valve Pleural Air Trapping',
+        shortTag: 'Trapped Pleural Air (Right)',
         graphicType: 'pneumothorax_right',
-        customImageUrl: '',
-        pathophysiology: 'Air enters the right pleural space via a one-way tissue valve and cannot escape. Positive pleural pressure collapses the right lung and pushes the trachea and mediastinum toward the opposite (left) side.',
-        findingIds: [
-          'palp_trachea_left',
-          'palp_exp_dec_right',
-          'perc_tympanic_right',
-          'ausc_absent_right',
-          'ausc_vr_dec_right'
-        ],
+        pathophysiology: 'One-way valve air trapping builds positive pressure in the right pleural space, collapsing the right lung, insulating sound transmission, and pushing the trachea to the left.',
+        findingIds: ['palp_trachea_left_push', 'palp_exp_dec_right', 'palp_frem_dec_right', 'perc_tympanic_right', 'ausc_absent_right', 'ausc_vr_dec_right'],
         ippaTable: {
-          inspection: 'Respiratory distress; Asymmetric chest wall movement (reduced on right)',
-          palpation: 'Trachea shifted to the LEFT; Decreased right chest expansion; Decreased/absent right tactile fremitus',
-          percussion: 'HYPERRESONANT / TYMPANIC over right hemithorax',
-          auscultation: 'ABSENT breath sounds on right; Decreased right vocal resonance'
+          inspection: 'Respiratory distress; Reduced right chest wall movement',
+          palpation_trachea: 'Trachea shifted to the LEFT (Pushed away)',
+          palpation_expansion: 'Decreased right chest expansion',
+          palpation_fremitus: 'Decreased/absent right tactile fremitus',
+          percussion: 'HYPERRESONANT / TYMPANIC on right',
+          auscultation_breath: 'ABSENT breath sounds on right',
+          auscultation_vocal: 'Decreased right vocal resonance'
+        }
+      },
+      {
+        id: 'tension_ptx_left',
+        name: 'Left Tension Pneumothorax',
+        shortTag: 'Trapped Pleural Air (Left)',
+        graphicType: 'pneumothorax_left',
+        pathophysiology: 'High-pressure air trapped in the left pleural cavity collapses the left lung, creates a hyperresonant/tympanic percussion note, blocks breath sounds, and pushes the trachea contralaterally to the right.',
+        findingIds: ['palp_trachea_right_push', 'palp_exp_dec_left', 'palp_frem_dec_left', 'perc_tympanic_left', 'ausc_absent_left', 'ausc_vr_dec_left'],
+        ippaTable: {
+          inspection: 'Respiratory distress; Reduced left chest wall movement',
+          palpation_trachea: 'Trachea shifted to the RIGHT (Pushed away)',
+          palpation_expansion: 'Decreased left chest expansion',
+          palpation_fremitus: 'Decreased/absent left tactile fremitus',
+          percussion: 'HYPERRESONANT / TYMPANIC on left',
+          auscultation_breath: 'ABSENT breath sounds on left',
+          auscultation_vocal: 'Decreased left vocal resonance'
         }
       },
       {
         id: 'effusion_left_massive',
         name: 'Massive Left Pleural Effusion',
-        shortTag: 'Large Fluid Collection in Left Pleural Space',
+        shortTag: 'Large Fluid Collection (Left)',
         graphicType: 'effusion_left',
-        customImageUrl: '',
-        pathophysiology: 'A large volume of fluid accumulates in the left pleural space, compressing the left lung, pushing the trachea/mediastinum to the right, and insulating sound/vibration transmission through the left chest wall.',
-        findingIds: [
-          'palp_trachea_right',
-          'palp_exp_dec_left',
-          'perc_dull_left',
-          'ausc_dec_left',
-          'ausc_vr_dec_left'
-        ],
+        pathophysiology: 'A massive volume of fluid in the left pleural space compresses the left lung, pushes the mediastinum/trachea to the right, and acts as an acoustic barrier that dampens fremitus and breath sounds.',
+        findingIds: ['palp_trachea_right_push', 'palp_exp_dec_left', 'palp_frem_dec_left', 'perc_stony_left', 'ausc_absent_left', 'ausc_vr_dec_left'],
         ippaTable: {
-          inspection: 'Asymmetric chest wall movement (reduced on left)',
-          palpation: 'Trachea shifted to the RIGHT; Decreased left chest expansion; Decreased/absent left tactile fremitus',
-          percussion: 'STONY DULLNESS over left hemithorax',
-          auscultation: 'DECREASED or ABSENT breath sounds on left; Decreased left vocal resonance'
+          inspection: 'Reduced left chest wall movement',
+          palpation_trachea: 'Trachea shifted to the RIGHT (Pushed away)',
+          palpation_expansion: 'Decreased left chest expansion',
+          palpation_fremitus: 'Decreased/absent left tactile fremitus',
+          percussion: 'STONY DULLNESS on left',
+          auscultation_breath: 'DECREASED / ABSENT breath sounds on left',
+          auscultation_vocal: 'Decreased left vocal resonance'
+        }
+      },
+      {
+        id: 'effusion_right',
+        name: 'Right Pleural Effusion (Moderate)',
+        shortTag: 'Pleural Fluid (Right, Midline Trachea)',
+        graphicType: 'effusion_right_mod',
+        pathophysiology: 'Fluid accumulating in the right pleural space separates the lung from the chest wall, producing stony dullness on percussion and muffling tactile fremitus and breath sounds. A moderate effusion does not shift the trachea.',
+        findingIds: ['palp_trachea_midline', 'palp_exp_dec_right', 'palp_frem_dec_right', 'perc_stony_right', 'ausc_absent_right', 'ausc_vr_dec_right'],
+        ippaTable: {
+          inspection: 'Reduced right chest wall movement',
+          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_expansion: 'Decreased right chest expansion',
+          palpation_fremitus: 'Decreased/absent right tactile fremitus',
+          percussion: 'STONY DULLNESS on right',
+          auscultation_breath: 'DECREASED / ABSENT breath sounds on right',
+          auscultation_vocal: 'Decreased right vocal resonance'
         }
       },
       {
         id: 'pulm_edema_bilat',
         name: 'Bilateral Pulmonary Edema',
-        shortTag: 'Cardiogenic / Alveolar-Interstitial Fluid',
+        shortTag: 'Alveolar Fluid (Cardiogenic)',
         graphicType: 'edema_bilat',
-        customImageUrl: '',
-        pathophysiology: 'Elevated pulmonary capillary hydrostatic pressure pushes transudative fluid into the interstitial space and basal alveoli bilaterally. Because air still fills most of the upper/mid lung volume, trachea and percussion often remain normal while basal alveoli snap open with fine crackles.',
-        findingIds: [
-          'palp_trachea_midline',
-          'perc_normal_bilat',
-          'ausc_fine_crep_bilat'
-        ],
+        pathophysiology: 'Elevated pulmonary capillary hydrostatic pressure forces transudate into basal interstitium and alveoli. Small airways snap open during late inspiration (fine crackles), while tracheal position and percussion remain normal.',
+        findingIds: ['palp_trachea_midline', 'perc_normal_bilat', 'ausc_fine_crep_bilat'],
         ippaTable: {
           inspection: 'Tachypnea; Symmetrical chest wall movement (NORMAL symmetry)',
-          palpation: 'Trachea midline (NORMAL); Normal bilateral chest expansion & tactile fremitus (NORMAL)',
-          percussion: 'NORMAL resonance bilaterally (note: findings in disease can still be normal!)',
-          auscultation: 'BILATERAL FINE LATE-INSPIRATORY CREPITATIONS (crackles) at lung bases; Normal vocal resonance'
+          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_expansion: 'Normal bilateral chest expansion (NORMAL)',
+          palpation_fremitus: 'Normal bilateral tactile fremitus (NORMAL)',
+          percussion: 'NORMAL resonance bilaterally',
+          auscultation_breath: 'BILATERAL FINE LATE-INSPIRATORY CREPITATIONS (crackles) at lung bases',
+          auscultation_vocal: 'Normal vocal resonance'
         }
       },
       {
         id: 'asthma_severe',
         name: 'Severe Asthmatic Attack',
-        shortTag: 'Diffuse Bronchospasm & Airway Inflammation',
+        shortTag: 'Bronchospasm & Airway Inflammation',
         graphicType: 'asthma_severe',
-        customImageUrl: '',
-        pathophysiology: 'Bronchial smooth muscle constriction, mucosal edema, and mucus plugging narrow the small airways diffusely. Expiration is prolonged with polyphonic wheezing and hyperinflation—or a "silent chest" if airflow becomes critically obstructed.',
-        findingIds: [
-          'insp_hyperinflation',
-          'perc_hyper_bilat',
-          'ausc_wheeze_bilat',
-          'ausc_silent_chest'
-        ],
+        pathophysiology: 'Diffuse bronchospasm, mucosal inflammation, and mucus plugging narrow the small airways, causing air trapping, expiratory wheezing, or a silent chest when airflow becomes critically reduced.',
+        findingIds: ['insp_hyperinflation', 'palp_trachea_midline', 'perc_hyper_bilat', 'ausc_wheeze_bilat', 'ausc_silent_chest'],
         ippaTable: {
           inspection: 'ACCESSORY MUSCLE USE & hyperinflated chest (barrel-shaped)',
-          palpation: 'Trachea midline (NORMAL); Symmetrically decreased chest expansion & tactile fremitus',
+          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_expansion: 'Symmetrically decreased chest expansion',
+          palpation_fremitus: 'Symmetrically decreased tactile fremitus',
           percussion: 'NORMAL to HYPERRESONANT bilaterally',
-          auscultation: 'BILATERAL EXPIRATORY WHEEZING (or SILENT CHEST if life-threatening); Normal/decreased vocal resonance'
+          auscultation_breath: 'BILATERAL EXPIRATORY WHEEZING (or SILENT CHEST if life-threatening)',
+          auscultation_vocal: 'Normal/decreased vocal resonance'
+        }
+      },
+      {
+        id: 'atelectasis_lul',
+        name: 'Left Upper Lobe Atelectasis',
+        shortTag: 'Lobar Collapse / Bronchial Obstruction',
+        graphicType: 'atelectasis_lul',
+        pathophysiology: 'Complete obstruction of the left upper lobe bronchus causes resorption of distal alveolar air and lobar collapse. Volume loss in the left upper hemithorax pulls the trachea ipsilaterally to the left, while the blocked bronchus prevents sound and vibration from reaching the chest wall.',
+        findingIds: ['palp_trachea_left_pull', 'palp_exp_dec_left', 'palp_frem_dec_lul', 'perc_dull_lul', 'ausc_absent_lul', 'ausc_vr_dec_lul'],
+        ippaTable: {
+          inspection: 'Reduced left chest wall movement',
+          palpation_trachea: 'Trachea shifted to the LEFT (Pulled toward collapse)',
+          palpation_expansion: 'Decreased left chest expansion',
+          palpation_fremitus: 'Decreased/absent left tactile fremitus',
+          percussion: 'DULLNESS on left percussion',
+          auscultation_breath: 'DECREASED / ABSENT breath sounds on left',
+          auscultation_vocal: 'Decreased left vocal resonance'
+        }
+      },
+      {
+        id: 'atelectasis_rll',
+        name: 'Right Lower Lobe Atelectasis',
+        shortTag: 'Lobar Collapse / Bronchial Obstruction',
+        graphicType: 'atelectasis_rll',
+        pathophysiology: 'Obstruction of the right lower lobe bronchus leads to alveolar gas resorption and lobar volume loss, pulling the trachea rightward, causing reduced right expansion, dullness over the right lower zone, and absent breath sounds due to airway occlusion.',
+        findingIds: ['palp_trachea_right_pull', 'palp_exp_dec_right', 'palp_frem_dec_rll', 'perc_dull_rll', 'ausc_absent_rll', 'ausc_vr_dec_rll'],
+        ippaTable: {
+          inspection: 'Reduced right chest wall movement',
+          palpation_trachea: 'Trachea shifted to the RIGHT (Pulled toward collapse)',
+          palpation_expansion: 'Decreased right chest expansion',
+          palpation_fremitus: 'Decreased/absent right tactile fremitus',
+          percussion: 'DULLNESS on right percussion',
+          auscultation_breath: 'DECREASED / ABSENT breath sounds on right',
+          auscultation_vocal: 'Decreased right vocal resonance'
         }
       }
     ];
 
     // ==========================================
-    // CATEGORY ICONS (Finger for Percussion, Stethoscope for Auscultation, etc.)
+    // ICONS & GRAPHICS
     // ==========================================
     function CategoryIcon({ category, size = 44 }) {
       if (category === 'Percussion') {
         return (
           <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="28" fill="#FFE4E6" stroke="#5A3825" strokeWidth="3" />
-            {/* Tapping waves */}
             <path d="M20 18C24 14 40 14 44 18" stroke="#C85A5A" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 3" />
             <circle cx="32" cy="22" r="4" fill="#F6AD55" />
-            {/* Cute Percussion Finger */}
             <path d="M27 25C27 21.5 37 21.5 37 25V41H42C44.5 41 46 43 46 45.5V48C46 51.5 43 54 39.5 54H25.5C22 54 19 51 19 47.5V39C19 36.5 22 36.5 24 38V28C24 26 25.5 25 27 25Z" fill="#FAD2B8" stroke="#5A3825" strokeWidth="3" strokeLinejoin="round" />
             <rect x="29" y="23" width="6" height="5" rx="2.5" fill="#FFF5F5" stroke="#5A3825" strokeWidth="2" />
           </svg>
@@ -370,7 +290,6 @@
         return (
           <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="28" fill="#E6FFFA" stroke="#5A3825" strokeWidth="3" />
-            {/* Stethoscope */}
             <path d="M20 16V26C20 33 25 38 32 38C39 38 44 33 44 26V16" stroke="#5A3825" strokeWidth="3.5" strokeLinecap="round" />
             <circle cx="20" cy="15" r="3" fill="#C85A5A" stroke="#5A3825" strokeWidth="2" />
             <circle cx="44" cy="15" r="3" fill="#C85A5A" stroke="#5A3825" strokeWidth="2" />
@@ -384,7 +303,6 @@
         return (
           <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="32" r="28" fill="#FEFCBF" stroke="#5A3825" strokeWidth="3" />
-            {/* Cute Open Hand */}
             <path d="M22 35V22C22 20 25 20 25 22V31M26 31V18C26 16 30 16 30 18V31M31 31V17C31 15 35 15 35 17V31M36 31V20C36 18 40 18 40 20V36C40 36 44 32 46 34C48 36 44 42 41 46C38 49 34 51 29 51C23 51 20 46 20 40V33C20 31 22 31 22 35Z" fill="#FAD2B8" stroke="#5A3825" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
             <circle cx="27" cy="41" r="1.5" fill="#5A3825" />
             <circle cx="34" cy="41" r="1.5" fill="#5A3825" />
@@ -403,63 +321,41 @@
       );
     }
 
-    // ==========================================
-    // KAWAII PATHOLOGY LUNG GRAPHICS
-    // ==========================================
     function LungPathologyGraphic({ type, customImageUrl, mystery = false, size = 'large' }) {
       if (!mystery && customImageUrl && customImageUrl.trim() !== '') {
         return (
           <div className="w-full h-full flex items-center justify-center p-2">
-            <img
-              src={customImageUrl}
-              alt="Disease diagram"
-              className="max-h-56 object-contain rounded-2xl border-2 border-[#5A3825]"
-            />
+            <img src={customImageUrl} alt="Disease diagram" className="max-h-56 object-contain rounded-2xl border-2 border-[#5A3825]" />
           </div>
         );
       }
 
-      // Trachea shift offsets (Standard anatomical view: Left side of diagram is Right Lung, Right side is Left Lung)
-      const tracheaShift =
-        mystery ? 0 :
-        type === 'pneumothorax_right' ? 12 : // shifts toward patient's left (viewer's right)
-        type === 'effusion_left' ? -12 : // shifts toward patient's right (viewer's left)
+      // Trachea shift (Patient Right = Viewer Left, Patient Left = Viewer Right)
+      // pneumothorax_right pushes Left (viewer Right: +12)
+      // effusion_left pushes Right (viewer Left: -12)
+      // atelectasis_lul pulls Left (viewer Right: +12)
+      // atelectasis_rll pulls Right (viewer Left: -12)
+      const tracheaShift = mystery ? 0 : 
+        (type === 'pneumothorax_right' || type === 'atelectasis_lul') ? 12 : 
+        (type === 'effusion_left' || type === 'pneumothorax_left' || type === 'atelectasis_rll') ? -12 : 
         0;
 
       const svgHeight = size === 'small' ? 150 : 240;
 
       return (
         <div className="relative flex flex-col items-center justify-center w-full">
-          {/* Anatomical orientation labels */}
           <div className="flex justify-between w-full px-4 text-xs font-bold text-[#8C584C] mb-1">
             <span className="bg-[#FFE4E6] px-2 py-0.5 rounded-full border border-[#5A3825]">Patient's RIGHT</span>
             <span className="bg-[#FFE4E6] px-2 py-0.5 rounded-full border border-[#5A3825]">Patient's LEFT</span>
           </div>
 
-          <svg
-            viewBox="0 0 260 210"
-            className="w-full"
-            style={{ maxHeight: svgHeight }}
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Background Pleural Cavity Outlines */}
+          <svg viewBox="0 0 260 210" className="w-full" style={{ maxHeight: svgHeight }} fill="none" xmlns="http://www.w3.org/2000/svg">
+            
             {/* Right Pleural Cavity (Viewer Left) */}
-            <path
-              d="M115 58 C82 55, 42 80, 38 140 C36 172, 60 185, 112 175 C118 173, 120 155, 118 115 Z"
-              fill={!mystery && type === 'pneumothorax_right' ? '#E2F1FF' : '#FFF5F5'}
-              stroke="#5A3825"
-              strokeWidth="3.5"
-              strokeDasharray={!mystery && type === 'pneumothorax_right' ? '5 3' : 'none'}
-            />
-
+            <path d="M115 58 C82 55, 42 80, 38 140 C36 172, 60 185, 112 175 C118 173, 120 155, 118 115 Z" fill={!mystery && type === 'pneumothorax_right' ? '#E2F1FF' : '#FFF5F5'} stroke="#5A3825" strokeWidth="3.5" strokeDasharray={!mystery && type === 'pneumothorax_right' ? '5 3' : 'none'} />
+            
             {/* Left Pleural Cavity (Viewer Right) */}
-            <path
-              d="M145 58 C178 55, 218 80, 222 140 C224 172, 200 185, 148 175 C142 173, 140 155, 142 115 Z"
-              fill={!mystery && type === 'effusion_left' ? '#BEE3F8' : '#FFF5F5'}
-              stroke="#5A3825"
-              strokeWidth="3.5"
-            />
+            <path d="M145 58 C178 55, 218 80, 222 140 C224 172, 200 185, 148 175 C142 173, 140 155, 142 115 Z" fill={!mystery && type === 'pneumothorax_left' ? '#E2F1FF' : (!mystery && type === 'effusion_left' ? '#BEE3F8' : '#FFF5F5')} stroke="#5A3825" strokeWidth="3.5" strokeDasharray={!mystery && type === 'pneumothorax_left' ? '5 3' : 'none'} />
 
             {/* Trachea & Cartilage Rings */}
             <g transform={`translate(${tracheaShift}, 0)`}>
@@ -468,164 +364,116 @@
               <line x1="122" y1="32" x2="138" y2="32" stroke="#D68C65" strokeWidth="3" />
               <line x1="122" y1="42" x2="138" y2="42" stroke="#D68C65" strokeWidth="3" />
               <line x1="122" y1="52" x2="138" y2="52" stroke="#D68C65" strokeWidth="3" />
-              {/* Bronchi */}
+              
+              {/* Bronchi - show obstruction block if atelectasis */}
               <path d="M125 63 L100 84" stroke="#5A3825" strokeWidth="8" strokeLinecap="round" />
               <path d="M135 63 L160 84" stroke="#5A3825" strokeWidth="8" strokeLinecap="round" />
               <path d="M125 63 L100 84" stroke="#F6C29F" strokeWidth="4" strokeLinecap="round" />
               <path d="M135 63 L160 84" stroke="#F6C29F" strokeWidth="4" strokeLinecap="round" />
+              
+              {!mystery && type === 'atelectasis_rll' && <circle cx="108" cy="77" r="5" fill="#E53E3E" />}
+              {!mystery && type === 'atelectasis_lul' && <circle cx="152" cy="77" r="5" fill="#E53E3E" />}
             </g>
 
             {/* Trachea Shift Arrow Indicator */}
             {!mystery && tracheaShift !== 0 && (
               <g>
-                <path
-                  d={tracheaShift > 0 ? "M95 28 L118 28" : "M165 28 L142 28"}
-                  stroke="#E53E3E"
-                  strokeWidth="3.5"
-                  strokeLinecap="round"
-                />
-                <polygon
-                  points={tracheaShift > 0 ? "118,23 126,28 118,33" : "142,23 134,28 142,33"}
-                  fill="#E53E3E"
-                />
+                <path d={tracheaShift > 0 ? "M95 28 L118 28" : "M165 28 L142 28"} stroke="#E53E3E" strokeWidth="3.5" strokeLinecap="round" />
+                <polygon points={tracheaShift > 0 ? "118,23 126,28 118,33" : "142,23 134,28 142,33"} fill="#E53E3E" />
               </g>
             )}
 
             {/* PATIENT'S RIGHT LUNG (Viewer Left) */}
             {!mystery && type === 'pneumothorax_right' ? (
               <g>
-                {/* Collapsed Right Lung */}
-                <path
-                  d="M114 82 C96 82, 82 98, 80 128 C79 145, 92 152, 112 146 Z"
-                  fill="#E5989B"
-                  stroke="#5A3825"
-                  strokeWidth="3.5"
-                />
-                {/* Trapped Air Labels & Pressure Arrows */}
+                <path d="M114 82 C96 82, 82 98, 80 128 C79 145, 92 152, 112 146 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
                 <text x="48" y="105" fill="#2B6CB0" fontSize="11" fontWeight="bold">AIR ++</text>
                 <path d="M58 115 L75 118" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
                 <path d="M55 140 L75 135" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
-                {/* Cute dizzy face on collapsed lung */}
                 <text x="90" y="122" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
+              </g>
+            ) : !mystery && type === 'atelectasis_rll' ? (
+              <g>
+                {/* Collapsed right lower lobe */}
+                <path d="M115 62 C85 60, 60 75, 55 100 C75 105, 100 110, 113 115 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                <path d="M55 100 C50 115, 60 145, 111 160 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
+                <text x="65" y="145" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
+              </g>
+            ) : !mystery && type === 'effusion_right_mod' ? (
+              <g>
+                {/* Moderate effusion right */}
+                <path d="M115 62 C85 60, 46 84, 43 138 C41 150, 45 155, 60 155 C80 155, 100 160, 111 170 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                <path d="M43 138 C41 168, 63 180, 111 170 C100 160, 80 155, 60 155 C45 155, 41 150, 43 138 Z" fill="#63B3ED" stroke="#5A3825" strokeWidth="3" />
+                <text x="60" y="165" fill="#FFFDF9" fontSize="10" fontWeight="bold">FLUID</text>
               </g>
             ) : (
               <g>
-                {/* Normal or Hyperinflated Right Lung */}
-                <path
-                  d={
-                    !mystery && type === 'asthma_severe'
-                      ? "M116 55 C80 50, 35 78, 33 144 C31 178, 58 190, 114 178 Z"
-                      : "M115 62 C85 60, 46 84, 43 138 C41 168, 63 180, 111 170 Z"
-                  }
-                  fill="#F4A29E"
-                  stroke="#5A3825"
-                  strokeWidth="3.5"
-                />
-                {/* Cute Face on Right Lung */}
+                <path d={!mystery && type === 'asthma_severe' ? "M116 55 C80 50, 35 78, 33 144 C31 178, 58 190, 114 178 Z" : "M115 62 C85 60, 46 84, 43 138 C41 168, 63 180, 111 170 Z"} fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                {!mystery && type === 'consolidation_right_upper' && (
+                  <g>
+                    <path d="M115 62 C85 60, 50 75, 48 95 C75 105, 100 100, 113 115 Z" fill="#D69E2E" opacity="0.85" stroke="#5A3825" strokeWidth="3" />
+                    <text x="65" y="85" fill="#5A3825" fontSize="9" fontWeight="bold">EXUDATE</text>
+                  </g>
+                )}
+                {/* Face */}
                 <circle cx="72" cy="118" r="3.5" fill="#5A3825" />
                 <circle cx="94" cy="118" r="3.5" fill="#5A3825" />
-                <circle cx="66" cy="124" r="4.5" fill="#E57373" opacity="0.6" />
-                <circle cx="100" cy="124" r="4.5" fill="#E57373" opacity="0.6" />
-                <path
-                  d={!mystery && (type === 'edema_bilat' || type === 'asthma_severe') ? "M79 128 Q83 122 87 128" : "M78 124 Q83 130 88 124"}
-                  stroke="#5A3825"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                />
+                <path d={!mystery && (type === 'edema_bilat' || type === 'asthma_severe') ? "M79 128 Q83 122 87 128" : "M78 124 Q83 130 88 124"} stroke="#5A3825" strokeWidth="2.8" strokeLinecap="round" />
               </g>
             )}
 
             {/* PATIENT'S LEFT LUNG (Viewer Right) */}
             {!mystery && type === 'effusion_left' ? (
               <g>
-                {/* Compressed Left Lung floating above pleural effusion */}
-                <path
-                  d="M145 66 C168 65, 192 82, 194 115 C180 125, 160 126, 145 120 Z"
-                  fill="#F4A29E"
-                  stroke="#5A3825"
-                  strokeWidth="3.5"
-                />
-                {/* Large Pleural Fluid Meniscus in Left Pleural Cavity */}
-                <path
-                  d="M142 122 C165 132, 195 125, 218 110 C222 138, 218 175, 148 174 C142 172, 141 150, 142 122 Z"
-                  fill="#63B3ED"
-                  stroke="#5A3825"
-                  strokeWidth="3"
-                />
+                <path d="M145 66 C168 65, 192 82, 194 115 C180 125, 160 126, 145 120 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                <path d="M142 122 C165 132, 195 125, 218 110 C222 138, 218 175, 148 174 C142 172, 141 150, 142 122 Z" fill="#63B3ED" stroke="#5A3825" strokeWidth="3" />
                 <text x="156" y="156" fill="#FFFDF9" fontSize="11" fontWeight="bold">FLUID</text>
-                {/* Squished face */}
-                <circle cx="162" cy="96" r="3" fill="#5A3825" />
-                <circle cx="178" cy="96" r="3" fill="#5A3825" />
-                <path d="M167 104 Q170 100 173 104" stroke="#5A3825" strokeWidth="2.5" strokeLinecap="round" />
+                <text x="162" y="100" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
+              </g>
+            ) : !mystery && type === 'pneumothorax_left' ? (
+              <g>
+                <path d="M146 82 C164 82, 178 98, 180 128 C181 145, 168 152, 148 146 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
+                <text x="180" y="105" fill="#2B6CB0" fontSize="11" fontWeight="bold">AIR ++</text>
+                <path d="M202 115 L185 118" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M205 140 L185 135" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
+                <text x="155" y="122" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
+              </g>
+            ) : !mystery && type === 'atelectasis_lul' ? (
+              <g>
+                {/* Collapsed left upper lobe */}
+                <path d="M145 75 C160 100, 185 115, 215 110 C219 140, 197 180, 149 170 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                <path d="M145 62 C175 60, 200 75, 215 110 C185 115, 160 100, 145 75 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
+                <text x="155" y="90" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
               </g>
             ) : (
               <g>
-                {/* Full Left Lung Outline */}
-                <path
-                  d={
-                    !mystery && type === 'asthma_severe'
-                      ? "M144 55 C180 50, 225 78, 227 144 C229 178, 202 190, 146 178 Z"
-                      : "M145 62 C175 60, 214 84, 217 138 C219 168, 197 180, 149 170 Z"
-                  }
-                  fill="#F4A29E"
-                  stroke="#5A3825"
-                  strokeWidth="3.5"
-                />
-
-                {/* Left Lower Lobe Consolidation Patch */}
+                <path d={!mystery && type === 'asthma_severe' ? "M144 55 C180 50, 225 78, 227 144 C229 178, 202 190, 146 178 Z" : "M145 62 C175 60, 214 84, 217 138 C219 168, 197 180, 149 170 Z"} fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
                 {!mystery && type === 'consolidation_left' && (
                   <g>
-                    <path
-                      d="M148 122 C172 115, 202 120, 215 136 C217 166, 195 178, 149 169 Z"
-                      fill="#D69E2E"
-                      opacity="0.85"
-                      stroke="#5A3825"
-                      strokeWidth="3"
-                    />
-                    <circle cx="170" cy="145" r="3" fill="#FFFDF9" opacity="0.8" />
-                    <circle cx="185" cy="152" r="4" fill="#FFFDF9" opacity="0.8" />
-                    <circle cx="198" cy="142" r="2.5" fill="#FFFDF9" opacity="0.8" />
-                    <text x="155" y="162" fill="#5A3825" fontSize="9.5" fontWeight="bold">EXUDATE</text>
+                    <path d="M148 122 C172 115, 202 120, 215 136 C217 166, 195 178, 149 169 Z" fill="#D69E2E" opacity="0.85" stroke="#5A3825" strokeWidth="3" />
+                    <text x="155" y="155" fill="#5A3825" fontSize="9.5" fontWeight="bold">EXUDATE</text>
                   </g>
                 )}
-
-                {/* Cute Face on Left Lung */}
+                {/* Face */}
                 <circle cx="166" cy="112" r="3.5" fill="#5A3825" />
                 <circle cx="188" cy="112" r="3.5" fill="#5A3825" />
-                <circle cx="160" cy="118" r="4.5" fill="#E57373" opacity="0.6" />
-                <circle cx="194" cy="118" r="4.5" fill="#E57373" opacity="0.6" />
-                <path
-                  d={!mystery ? "M173 122 Q177 116 181 122" : "M172 118 Q177 124 182 118"}
-                  stroke="#5A3825"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                />
+                <path d={!mystery ? "M173 122 Q177 116 181 122" : "M172 118 Q177 124 182 118"} stroke="#5A3825" strokeWidth="2.8" strokeLinecap="round" />
               </g>
             )}
 
-            {/* Bilateral Pulmonary Edema Basal Bubbles */}
+            {/* Bilateral Pulmonary Edema */}
             {!mystery && type === 'edema_bilat' && (
               <g>
-                <path
-                  d="M44 138 C65 132, 95 135, 111 142 C111 168, 63 178, 44 138 Z"
-                  fill="#90CDF4"
-                  opacity="0.75"
-                />
-                <path
-                  d="M149 142 C165 135, 195 132, 216 138 C197 178, 149 168, 149 142 Z"
-                  fill="#90CDF4"
-                  opacity="0.75"
-                />
-                <circle cx="68" cy="152" r="4" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
-                <circle cx="84" cy="158" r="3" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
-                <circle cx="96" cy="149" r="3.5" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
-                <circle cx="166" cy="150" r="3.5" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
-                <circle cx="182" cy="158" r="4" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
-                <circle cx="195" cy="149" r="3" fill="#FFFDF9" stroke="#2B6CB0" strokeWidth="1.5" />
+                <path d="M44 138 C65 132, 95 135, 111 142 C111 168, 63 178, 44 138 Z" fill="#90CDF4" opacity="0.75" />
+                <path d="M149 142 C165 135, 195 132, 216 138 C197 178, 149 168, 149 142 Z" fill="#90CDF4" opacity="0.75" />
+                <circle cx="68" cy="152" r="4" fill="#FFFDF9" stroke="#2B6CB0" />
+                <circle cx="84" cy="158" r="3" fill="#FFFDF9" stroke="#2B6CB0" />
+                <circle cx="166" cy="150" r="3.5" fill="#FFFDF9" stroke="#2B6CB0" />
+                <circle cx="182" cy="158" r="4" fill="#FFFDF9" stroke="#2B6CB0" />
               </g>
             )}
 
-            {/* Severe Asthma Constricted Airways & Wheeze Swirls */}
+            {/* Asthma Wheeze */}
             {!mystery && type === 'asthma_severe' && (
               <g>
                 <path d="M58 92 Q78 82 95 96" stroke="#DD6B20" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 3" />
@@ -635,7 +483,7 @@
               </g>
             )}
 
-            {/* Mystery Badge Overlay for Unflipped Mode 2 Cards */}
+            {/* Mystery Overlay */}
             {mystery && (
               <g>
                 <circle cx="130" cy="122" r="24" fill="#FFFDF9" stroke="#5A3825" strokeWidth="3.5" />
@@ -648,37 +496,23 @@
     }
 
     // ==========================================
-    // MAIN APPLICATION COMPONENT
+    // MAIN APP
     // ==========================================
     function App() {
-      // Load saved database from localStorage if available
       const [diseases, setDiseases] = useState(() => {
-        try {
-          const saved = localStorage.getItem('resp_pe_diseases_v2');
-          return saved ? JSON.parse(saved) : DEFAULT_DISEASES;
-        } catch (e) {
-          return DEFAULT_DISEASES;
-        }
+        try { const saved = localStorage.getItem('resp_pe_diseases_v3'); return saved ? JSON.parse(saved) : DEFAULT_DISEASES; } catch (e) { return DEFAULT_DISEASES; }
       });
-
       const [findings, setFindings] = useState(() => {
-        try {
-          const saved = localStorage.getItem('resp_pe_findings_v2');
-          return saved ? JSON.parse(saved) : DEFAULT_FINDINGS;
-        } catch (e) {
-          return DEFAULT_FINDINGS;
-        }
+        try { const saved = localStorage.getItem('resp_pe_findings_v3'); return saved ? JSON.parse(saved) : DEFAULT_FINDINGS; } catch (e) { return DEFAULT_FINDINGS; }
       });
 
-      // Save to localStorage whenever modified in Professor Mode
       useEffect(() => {
         try {
-          localStorage.setItem('resp_pe_diseases_v2', JSON.stringify(diseases));
-          localStorage.setItem('resp_pe_findings_v2', JSON.stringify(findings));
+          localStorage.setItem('resp_pe_diseases_v3', JSON.stringify(diseases));
+          localStorage.setItem('resp_pe_findings_v3', JSON.stringify(findings));
         } catch (e) {}
       }, [diseases, findings]);
 
-      // Game Mode ('mode1' = Disease -> Findings, 'mode2' = IPPA Table -> Disease)
       const [gameMode, setGameMode] = useState('mode1');
       const [score, setScore] = useState(0);
 
@@ -692,33 +526,19 @@
       const [mode2CaseIndex, setMode2CaseIndex] = useState(0);
       const [stepByStepIppa, setStepByStepIppa] = useState(true);
       const [revealedSteps, setRevealedSteps] = useState({
-        inspection: true,
-        palpation: false,
-        percussion: false,
-        auscultation: false
+        inspection: true, palpation_trachea: false, palpation_expansion: false, palpation_fremitus: false,
+        percussion: false, auscultation_breath: false, auscultation_vocal: false
       });
       const [guessedDiseaseIds, setGuessedDiseaseIds] = useState([]);
       const [mode2Feedback, setMode2Feedback] = useState(null);
 
-      // Professor Mode Modal States
+      // Editor States
       const [showProfModal, setShowProfModal] = useState(false);
       const [profUnlocked, setProfUnlocked] = useState(false);
       const [pinInput, setPinInput] = useState('');
       const [profTab, setProfTab] = useState('diseases');
       const [editingDiseaseId, setEditingDiseaseId] = useState(diseases[0]?.id || '');
 
-      // New Finding Form State
-      const [newFinding, setNewFinding] = useState({
-        category: 'Auscultation',
-        title: '',
-        subtitle: '',
-        rationale: ''
-      });
-
-      // New Disease Form State
-      const [newDiseaseName, setNewDiseaseName] = useState('');
-
-      // Helper to shuffle an array
       const shuffleArray = (arr) => {
         const copy = [...arr];
         for (let i = copy.length - 1; i > 0; i--) {
@@ -728,7 +548,6 @@
         return copy;
       };
 
-      // Build the 9-card grid for Mode 1 whenever a disease is drawn
       const setupMode1Cards = (diseaseObj) => {
         if (!diseaseObj) return;
         const correctCards = findings.filter((f) => diseaseObj.findingIds.includes(f.id));
@@ -736,46 +555,30 @@
         const targetCount = Math.max(9, correctCards.length + 3);
         const neededDistractors = Math.max(0, targetCount - correctCards.length);
         const chosenDistractors = shuffleArray(distractorPool).slice(0, neededDistractors);
-        const combined = shuffleArray([...correctCards, ...chosenDistractors]);
-        setPresentedFindings(combined);
+        setPresentedFindings(shuffleArray([...correctCards, ...chosenDistractors]));
         setSelectedFindingIds([]);
         setActiveFeedback(null);
       };
 
-      // Draw a new disease card in Mode 1
       const handleDrawDiseaseCard = (forcedIndex = null) => {
         if (diseases.length === 0) return;
-        let nextIdx;
-        if (forcedIndex !== null) {
-          nextIdx = forcedIndex;
-        } else if (currentDiseaseIndex === null) {
-          nextIdx = 0;
-        } else {
-          nextIdx = (currentDiseaseIndex + 1) % diseases.length;
-        }
+        const nextIdx = forcedIndex !== null ? forcedIndex : (currentDiseaseIndex === null ? 0 : (currentDiseaseIndex + 1) % diseases.length);
         setCurrentDiseaseIndex(nextIdx);
         setupMode1Cards(diseases[nextIdx]);
       };
 
-      // Select a finding card in Mode 1
       const handleSelectFinding = (finding) => {
         if (currentDiseaseIndex === null) return;
-        if (selectedFindingIds.includes(finding.id)) {
-          setActiveFeedback({
-            finding,
-            isCorrect: diseases[currentDiseaseIndex].findingIds.includes(finding.id)
-          });
-          return;
-        }
-
         const currentDisease = diseases[currentDiseaseIndex];
         const isCorrect = currentDisease.findingIds.includes(finding.id);
-        setSelectedFindingIds((prev) => [...prev, finding.id]);
-        setScore((prev) => (isCorrect ? prev + 1 : prev - 1));
+        
+        if (!selectedFindingIds.includes(finding.id)) {
+          setSelectedFindingIds((prev) => [...prev, finding.id]);
+          setScore((prev) => (isCorrect ? prev + 1 : prev - 1));
+        }
         setActiveFeedback({ finding, isCorrect });
       };
 
-      // Mode 1 progress calculation
       const currentDisease = currentDiseaseIndex !== null ? diseases[currentDiseaseIndex] : null;
       const correctSelectedCount = useMemo(() => {
         if (!currentDisease) return 0;
@@ -785,7 +588,6 @@
       const totalCorrectForCurrent = currentDisease ? currentDisease.findingIds.length : 0;
       const isMode1RoundComplete = currentDisease && totalCorrectForCurrent > 0 && correctSelectedCount === totalCorrectForCurrent;
 
-      // Mode 2 handlers
       const currentMode2Case = diseases[mode2CaseIndex] || diseases[0];
 
       const startMode2Case = (idx) => {
@@ -793,28 +595,23 @@
         setMode2CaseIndex(nextIdx);
         setGuessedDiseaseIds([]);
         setMode2Feedback(null);
-        setRevealedSteps(
-          stepByStepIppa
-            ? { inspection: true, palpation: false, percussion: false, auscultation: false }
-            : { inspection: true, palpation: true, percussion: true, auscultation: true }
+        setRevealedSteps(stepByStepIppa 
+          ? { inspection: true, palpation_trachea: false, palpation_expansion: false, palpation_fremitus: false, percussion: false, auscultation_breath: false, auscultation_vocal: false }
+          : { inspection: true, palpation_trachea: true, palpation_expansion: true, palpation_fremitus: true, percussion: true, auscultation_breath: true, auscultation_vocal: true }
         );
       };
 
       const toggleStepByStepMode = (useSteps) => {
         setStepByStepIppa(useSteps);
-        setRevealedSteps(
-          useSteps
-            ? { inspection: true, palpation: false, percussion: false, auscultation: false }
-            : { inspection: true, palpation: true, percussion: true, auscultation: true }
+        setRevealedSteps(useSteps
+          ? { inspection: true, palpation_trachea: false, palpation_expansion: false, palpation_fremitus: false, percussion: false, auscultation_breath: false, auscultation_vocal: false }
+          : { inspection: true, palpation_trachea: true, palpation_expansion: true, palpation_fremitus: true, percussion: true, auscultation_breath: true, auscultation_vocal: true }
         );
       };
 
       const handleGuessDiseaseMode2 = (disease) => {
         if (guessedDiseaseIds.includes(disease.id)) {
-          setMode2Feedback({
-            disease,
-            isCorrect: disease.id === currentMode2Case.id
-          });
+          setMode2Feedback({ disease, isCorrect: disease.id === currentMode2Case.id });
           return;
         }
         const isCorrect = disease.id === currentMode2Case.id;
@@ -822,662 +619,253 @@
         setScore((prev) => (isCorrect ? prev + 1 : prev - 1));
         setMode2Feedback({ disease, isCorrect });
         if (isCorrect) {
-          setRevealedSteps({ inspection: true, palpation: true, percussion: true, auscultation: true });
+          setRevealedSteps({ inspection: true, palpation_trachea: true, palpation_expansion: true, palpation_fremitus: true, percussion: true, auscultation_breath: true, auscultation_vocal: true });
         }
       };
 
-      // Full game reset
       const handleResetGame = () => {
         setScore(0);
         setSelectedFindingIds([]);
         setActiveFeedback(null);
-        if (currentDiseaseIndex !== null) {
-          setupMode1Cards(diseases[currentDiseaseIndex]);
-        }
+        if (currentDiseaseIndex !== null) setupMode1Cards(diseases[currentDiseaseIndex]);
         setGuessedDiseaseIds([]);
         setMode2Feedback(null);
-        setRevealedSteps(
-          stepByStepIppa
-            ? { inspection: true, palpation: false, percussion: false, auscultation: false }
-            : { inspection: true, palpation: true, percussion: true, auscultation: true }
+        setRevealedSteps(stepByStepIppa 
+          ? { inspection: true, palpation_trachea: false, palpation_expansion: false, palpation_fremitus: false, percussion: false, auscultation_breath: false, auscultation_vocal: false }
+          : { inspection: true, palpation_trachea: true, palpation_expansion: true, palpation_fremitus: true, percussion: true, auscultation_breath: true, auscultation_vocal: true }
         );
-      };
-
-      // Professor Mode helpers
-      const editingDisease = diseases.find((d) => d.id === editingDiseaseId) || diseases[0];
-
-      const handleToggleFindingForDisease = (diseaseId, findingId) => {
-        setDiseases((prev) =>
-          prev.map((d) => {
-            if (d.id !== diseaseId) return d;
-            const exists = d.findingIds.includes(findingId);
-            const nextIds = exists
-              ? d.findingIds.filter((id) => id !== findingId)
-              : [...d.findingIds, findingId];
-            return { ...d, findingIds: nextIds };
-          })
-        );
-      };
-
-      const handleUpdateDiseaseField = (diseaseId, field, value) => {
-        setDiseases((prev) =>
-          prev.map((d) => (d.id === diseaseId ? { ...d, [field]: value } : d))
-        );
-      };
-
-      const handleUpdateIppaField = (diseaseId, step, value) => {
-        setDiseases((prev) =>
-          prev.map((d) =>
-            d.id === diseaseId
-              ? { ...d, ippaTable: { ...d.ippaTable, [step]: value } }
-              : d
-          )
-        );
-      };
-
-      const handleImageFileUpload = (diseaseId, e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          handleUpdateDiseaseField(diseaseId, 'customImageUrl', reader.result);
-        };
-        reader.readAsDataURL(file);
-      };
-
-      const handleAddFinding = (e) => {
-        e.preventDefault();
-        if (!newFinding.title.trim()) return;
-        const created = {
-          id: 'custom_f_' + Date.now(),
-          category: newFinding.category,
-          title: newFinding.title.trim(),
-          subtitle: newFinding.subtitle.trim() || 'Physical examination finding',
-          rationale: newFinding.rationale.trim() || 'Clinical correlation for this physical sign.'
-        };
-        setFindings((prev) => [...prev, created]);
-        setNewFinding({ category: 'Auscultation', title: '', subtitle: '', rationale: '' });
-      };
-
-      const handleAddNewDisease = (e) => {
-        e.preventDefault();
-        if (!newDiseaseName.trim()) return;
-        const newId = 'disease_' + Date.now();
-        const created = {
-          id: newId,
-          name: newDiseaseName.trim(),
-          shortTag: 'Custom Respiratory Case',
-          graphicType: 'consolidation_left',
-          customImageUrl: '',
-          pathophysiology: 'Describe the underlying pathophysiology and why these physical findings occur.',
-          findingIds: ['palp_trachea_midline'],
-          ippaTable: {
-            inspection: 'Normal or asymmetric chest wall movement',
-            palpation: 'Trachea midline (NORMAL); Tactile fremitus findings',
-            percussion: 'Resonant or dull percussion note',
-            auscultation: 'Breath sounds and vocal resonance findings'
-          }
-        };
-        setDiseases((prev) => [...prev, created]);
-        setEditingDiseaseId(newId);
-        setNewDiseaseName('');
-      };
-
-      const handleExportJson = () => {
-        const payload = JSON.stringify({ diseases, findings }, null, 2);
-        const blob = new Blob([payload], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'respiratory-exam-game-data.json';
-        a.click();
-        URL.revokeObjectURL(url);
-      };
-
-      const handleImportJson = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const parsed = JSON.parse(reader.result);
-            if (Array.isArray(parsed.diseases) && Array.isArray(parsed.findings)) {
-              setDiseases(parsed.diseases);
-              setFindings(parsed.findings);
-              alert('Successfully imported clinical database!');
-            }
-          } catch (err) {
-            alert('Invalid JSON file.');
-          }
-        };
-        reader.readAsText(file);
-      };
-
-      const handleRestoreFactoryDefaults = () => {
-        if (window.confirm('Restore factory default diseases and findings?')) {
-          setDiseases(DEFAULT_DISEASES);
-          setFindings(DEFAULT_FINDINGS);
-          localStorage.removeItem('resp_pe_diseases_v2');
-          localStorage.removeItem('resp_pe_findings_v2');
-        }
       };
 
       return (
         <div className="min-h-screen flex flex-col justify-between p-3 md:p-6 select-none">
-          {/* TOP HEADER BAR */}
           <header className="max-w-7xl w-full mx-auto bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-4 md:p-5 kawaii-shadow mb-5">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              {/* Left: Title & Subtitle */}
               <div className="flex items-center gap-3.5">
-                <div className="w-14 h-14 rounded-2xl bg-[#FAD2CC] border-3 border-[#5A3825] flex items-center justify-center text-3xl shrink-0 kawaii-shadow-sm">
-                  🫁
-                </div>
+                <div className="w-14 h-14 rounded-2xl bg-[#FAD2CC] border-3 border-[#5A3825] flex items-center justify-center text-3xl shrink-0 kawaii-shadow-sm">🫁</div>
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold uppercase tracking-wider bg-[#FFE4E6] text-[#C85A5A] px-2.5 py-0.5 rounded-full border border-[#5A3825]">
-                      Year 1 Medical Physiology & Physical Exam
-                    </span>
-                  </div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-[#C85A5A] tracking-tight mt-0.5">
-                    Respiratory System Physical Examination
-                  </h1>
+                  <span className="text-xs font-bold uppercase bg-[#FFE4E6] text-[#C85A5A] px-2.5 py-0.5 rounded-full border border-[#5A3825]">Year 1 Medical Physiology</span>
+                  <h1 className="text-2xl md:text-3xl font-bold text-[#C85A5A] tracking-tight mt-0.5">Respiratory System Physical Examination</h1>
                 </div>
               </div>
 
-              {/* Center: Mode Switcher */}
-              <div className="flex bg-[#FDF0F0] p-1.5 rounded-2xl border-2 border-[#5A3825] self-start lg:self-auto">
-                <button
-                  onClick={() => setGameMode('mode1')}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
-                    gameMode === 'mode1'
-                      ? 'bg-[#C85A5A] text-white shadow-sm'
-                      : 'text-[#5A3825] hover:bg-[#FAD2CC]/50'
-                  }`}
-                >
-                  🃏 Mode 1: Match Findings
-                </button>
-                <button
-                  onClick={() => setGameMode('mode2')}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
-                    gameMode === 'mode2'
-                      ? 'bg-[#C85A5A] text-white shadow-sm'
-                      : 'text-[#5A3825] hover:bg-[#FAD2CC]/50'
-                  }`}
-                >
-                  🩺 Mode 2: IPPA Table ➔ Disease
-                </button>
+              <div className="flex bg-[#FDF0F0] p-1.5 rounded-2xl border-2 border-[#5A3825]">
+                <button onClick={() => setGameMode('mode1')} className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${gameMode === 'mode1' ? 'bg-[#C85A5A] text-white shadow-sm' : 'text-[#5A3825] hover:bg-[#FAD2CC]/50'}`}>🃏 Mode 1: Match Findings</button>
+                <button onClick={() => setGameMode('mode2')} className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${gameMode === 'mode2' ? 'bg-[#C85A5A] text-white shadow-sm' : 'text-[#5A3825] hover:bg-[#FAD2CC]/50'}`}>🩺 Mode 2: Diagnose Patient</button>
               </div>
 
-              {/* Top Right: Score Counter, Reset Button & Professor Backdoor */}
-              <div className="flex items-center gap-2.5 self-end lg:self-auto">
+              <div className="flex items-center gap-2.5">
                 <div className="bg-[#FFE4E6] border-3 border-[#5A3825] rounded-2xl px-4 py-1.5 flex items-center gap-2 kawaii-shadow-sm">
                   <span className="text-xs font-bold uppercase text-[#8C584C]">Score</span>
-                  <span className={`text-2xl font-bold font-display ${score >= 0 ? 'text-[#2F855A]' : 'text-[#9B2C2C]'}`}>
-                    {score > 0 ? `+${score}` : score}
-                  </span>
+                  <span className={`text-2xl font-bold font-display ${score >= 0 ? 'text-[#2F855A]' : 'text-[#9B2C2C]'}`}>{score > 0 ? `+${score}` : score}</span>
                 </div>
-
-                <button
-                  onClick={handleResetGame}
-                  className="bg-[#FFF5F5] hover:bg-[#FED7D7] active:translate-y-0.5 text-[#5A3825] font-bold text-sm px-3.5 py-2.5 rounded-2xl border-3 border-[#5A3825] kawaii-shadow-sm transition"
-                  title="Reset Score & Current Round"
-                >
-                  🔄 Reset
-                </button>
-
-                <button
-                  onClick={() => setShowProfModal(true)}
-                  className="bg-[#FEFCBF] hover:bg-[#FAF089] active:translate-y-0.5 text-[#5A3825] font-bold text-sm px-3.5 py-2.5 rounded-2xl border-3 border-[#5A3825] kawaii-shadow-sm transition"
-                  title="Professor Backdoor to Edit Diseases, Findings & Graphics"
-                >
-                  ⚙️ Professor Mode
-                </button>
+                <button onClick={handleResetGame} className="bg-[#FFF5F5] hover:bg-[#FED7D7] text-[#5A3825] font-bold text-sm px-3.5 py-2.5 rounded-2xl border-3 border-[#5A3825] kawaii-shadow-sm transition">🔄 Reset</button>
+                <button onClick={() => setShowProfModal(true)} className="bg-[#FEFCBF] hover:bg-[#FAF089] text-[#5A3825] font-bold text-sm px-3.5 py-2.5 rounded-2xl border-3 border-[#5A3825] kawaii-shadow-sm transition">⚙️ Prof Mode</button>
               </div>
             </div>
 
-            {/* Short Instructions Banner */}
             <div className="mt-3 pt-3 border-t-2 border-dashed border-[#FAD2CC] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-[#6B4433]">
-              {gameMode === 'mode1' ? (
-                <p>
-                  <strong className="text-[#C85A5A]">Instructions (Mode 1):</strong> Click the <strong>Disease Deck</strong> on the left to draw a patient card. Then select all consistent <strong>Physical Exam Finding cards</strong> on the right (<span className="text-[#2F855A] font-bold">+1 Light Green</span> for correct, <span className="text-[#9B2C2C] font-bold">-1 Dark Red</span> for inconsistent).
-                </p>
-              ) : (
-                <p>
-                  <strong className="text-[#C85A5A]">Instructions (Mode 2):</strong> Examine the patient's <strong>Inspection, Palpation, Percussion, and Auscultation (IPPA)</strong> findings in the table below (remember: some findings in disease can still be <strong>normal</strong>!), then click the matching <strong>Mystery Disease Card</strong> to flip and reveal its pathology!
-                </p>
-              )}
-
-              {/* Quick Classroom Case Selector */}
-              <div className="flex items-center gap-2 shrink-0">
+              {gameMode === 'mode1' ? 
+                <p><strong className="text-[#C85A5A]">Mode 1:</strong> Draw a Disease Card, then click all matching physical exam findings.</p> : 
+                <p><strong className="text-[#C85A5A]">Mode 2:</strong> Examine the IPPA findings, then click the correct Mystery Lung to diagnose.</p>}
+              
+              <div className="flex items-center gap-2">
                 <label className="text-xs font-bold text-[#8C584C]">Jump to Case:</label>
-                <select
-                  value={gameMode === 'mode1' ? (currentDiseaseIndex ?? '') : mode2CaseIndex}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === '') return;
-                    if (gameMode === 'mode1') {
-                      handleDrawDiseaseCard(Number(val));
-                    } else {
-                      startMode2Case(Number(val));
-                    }
-                  }}
-                  className="bg-[#FFF5F5] border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs font-bold text-[#5A3825]"
-                >
+                <select value={gameMode === 'mode1' ? (currentDiseaseIndex ?? '') : mode2CaseIndex} onChange={(e) => { const v = e.target.value; if(v==='') return; gameMode === 'mode1' ? handleDrawDiseaseCard(Number(v)) : startMode2Case(Number(v)); }} className="bg-[#FFF5F5] border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs font-bold text-[#5A3825]">
                   {gameMode === 'mode1' && <option value="">-- Draw from Deck --</option>}
-                  {diseases.map((d, idx) => (
-                    <option key={d.id} value={idx}>
-                      {gameMode === 'mode2' ? `Mystery Case #${idx + 1}` : `${idx + 1}. ${d.name}`}
-                    </option>
-                  ))}
+                  {diseases.map((d, idx) => <option key={d.id} value={idx}>{gameMode === 'mode2' ? `Mystery Case #${idx + 1}` : `${idx + 1}. ${d.name}`}</option>)}
                 </select>
               </div>
             </div>
           </header>
 
-          {/* ==========================================
-              MODE 1: DISEASE DECK (LEFT) -> FINDINGS (RIGHT)
-             ========================================== */}
+          {/* ======================= MODE 1 ======================= */}
           {gameMode === 'mode1' && (
             <main className="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* LEFT SIDE: DISEASE CARD AREA (5 Columns on large screens) */}
-              <section className="lg:col-span-5 flex flex-col gap-4">
-                <div className="bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow flex flex-col items-center justify-between min-h-[540px]">
-                  <div className="w-full flex items-center justify-between border-b-2 border-[#FAD2CC] pb-2.5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#8C584C]">
-                      Left Area • Disease Deck ({diseases.length} Cases)
-                    </span>
-                    {currentDisease && (
-                      <button
-                        onClick={() => handleDrawDiseaseCard()}
-                        className="bg-[#C85A5A] hover:bg-[#B24949] text-white text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825] transition"
-                      >
-                        🃏 Draw Next Disease Card ➔
-                      </button>
-                    )}
-                  </div>
-
-                  {/* If no card drawn yet: show clickable stacked deck graphic */}
-                  {!currentDisease ? (
-                    <div className="my-auto flex flex-col items-center text-center py-8">
-                      <button
-                        onClick={() => handleDrawDiseaseCard(0)}
-                        className="group relative w-64 h-80 bg-[#FAD2CC] hover:bg-[#F8C2BA] border-4 border-[#5A3825] rounded-3xl kawaii-shadow flex flex-col items-center justify-center p-6 transition transform hover:-translate-y-1 cursor-pointer"
-                      >
-                        {/* Deck stack effect */}
-                        <div className="absolute -right-2.5 -bottom-2.5 w-full h-full rounded-3xl border-4 border-[#5A3825] bg-[#FFE4E6] -z-10"></div>
-                        <div className="w-24 h-24 rounded-full bg-[#FFFDF9] border-3 border-[#5A3825] flex items-center justify-center text-5xl mb-4 animate-float">
-                          🫁
-                        </div>
-                        <span className="font-display text-2xl font-bold text-[#C85A5A]">
-                          DISEASE DECK
-                        </span>
-                        <span className="text-xs font-bold text-[#5A3825] mt-2 bg-[#FFFDF9] px-3 py-1 rounded-full border-2 border-[#5A3825]">
-                          👆 Click Top of Deck to Draw!
-                        </span>
-                      </button>
-                      <p className="text-xs text-[#8C584C] max-w-xs mt-6">
-                        Includes: Left Lower Lung Consolidation, Right Tension Pneumothorax, Massive Left Pleural Effusion, Bilateral Pulmonary Edema, and Severe Asthmatic Attack.
-                      </p>
-                    </div>
-                  ) : (
-                    /* Active Disease Card filling the whole left side */
-                    <div className="w-full flex-1 flex flex-col justify-between mt-3">
-                      <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-4 text-center">
-                        <span className="inline-block text-xs font-bold bg-[#FAD2CC] text-[#5A3825] px-3 py-0.5 rounded-full border border-[#5A3825] mb-1">
-                          Case {currentDiseaseIndex + 1} of {diseases.length} • {currentDisease.shortTag}
-                        </span>
-                        <h2 className="text-2xl font-bold text-[#C85A5A] font-display">
-                          {currentDisease.name}
-                        </h2>
-                      </div>
-
-                      {/* Custom Kawaii Pathology Graphic */}
-                      <div className="my-3 bg-[#FFFDF9] border-2 border-dashed border-[#FAD2CC] rounded-2xl p-3 flex flex-col items-center">
-                        <LungPathologyGraphic
-                          type={currentDisease.graphicType}
-                          customImageUrl={currentDisease.customImageUrl}
-                          mystery={false}
-                        />
-                      </div>
-
-                      {/* Progress Counter & Pathophysiology Box */}
-                      <div className="space-y-2.5">
-                        <div className="flex items-center justify-between bg-[#FFE4E6] border-2 border-[#5A3825] rounded-xl px-3.5 py-2">
-                          <span className="text-xs font-bold text-[#5A3825]">
-                            Matched Findings Progress:
-                          </span>
-                          <span className="text-sm font-bold font-display text-[#C85A5A]">
-                            {correctSelectedCount} / {totalCorrectForCurrent} Correct Signs Found
-                          </span>
-                        </div>
-
-                        {isMode1RoundComplete ? (
-                          <div className="bg-[#FEFCBF] border-2 border-[#5A3825] rounded-xl p-3 text-xs text-[#5A3825]">
-                            <strong className="block text-[#975A16] mb-0.5">💡 Pathophysiology Mechanism (Unlocked!):</strong>
-                            {currentDisease.pathophysiology}
-                          </div>
-                        ) : (
-                          <div className="bg-[#FFF5F5] border-2 border-dashed border-[#FAD2CC] rounded-xl p-3 text-xs text-[#8C584C] text-center">
-                            🔒 <strong>Pathophysiology Mechanism Hidden</strong> — Select all {totalCorrectForCurrent} correct physical exam findings on the right to unlock the full mechanism!
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+              <section className="lg:col-span-5 bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow flex flex-col justify-between min-h-[540px]">
+                <div className="w-full flex items-center justify-between border-b-2 border-[#FAD2CC] pb-2.5">
+                  <span className="text-xs font-bold uppercase text-[#8C584C]">Disease Deck ({diseases.length} Cases)</span>
+                  {currentDisease && <button onClick={() => handleDrawDiseaseCard()} className="bg-[#C85A5A] text-white text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]">🃏 Next Card ➔</button>}
                 </div>
+                {!currentDisease ? (
+                  <div className="my-auto flex flex-col items-center py-8">
+                    <button onClick={() => handleDrawDiseaseCard(0)} className="group relative w-64 h-80 bg-[#FAD2CC] hover:bg-[#F8C2BA] border-4 border-[#5A3825] rounded-3xl kawaii-shadow flex flex-col items-center justify-center p-6 cursor-pointer">
+                      <div className="absolute -right-2.5 -bottom-2.5 w-full h-full rounded-3xl border-4 border-[#5A3825] bg-[#FFE4E6] -z-10"></div>
+                      <div className="text-5xl mb-4 animate-float">🫁</div>
+                      <span className="font-display text-2xl font-bold text-[#C85A5A]">DISEASE DECK</span>
+                      <span className="text-xs font-bold text-[#5A3825] mt-2 bg-[#FFFDF9] px-3 py-1 rounded-full border-2 border-[#5A3825]">👆 Click to Draw!</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col justify-between mt-3">
+                    <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-4 text-center">
+                      <span className="inline-block text-xs font-bold bg-[#FAD2CC] text-[#5A3825] px-3 py-0.5 rounded-full border border-[#5A3825] mb-1">Case {currentDiseaseIndex + 1} of {diseases.length} • {currentDisease.shortTag}</span>
+                      <h2 className="text-2xl font-bold text-[#C85A5A] font-display leading-tight">{currentDisease.name}</h2>
+                    </div>
+                    <div className="my-3 bg-[#FFFDF9] border-2 border-dashed border-[#FAD2CC] rounded-2xl p-3 flex flex-col items-center">
+                      <LungPathologyGraphic type={currentDisease.graphicType} customImageUrl={currentDisease.customImageUrl} mystery={false} />
+                    </div>
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between bg-[#FFE4E6] border-2 border-[#5A3825] rounded-xl px-3.5 py-2">
+                        <span className="text-xs font-bold text-[#5A3825]">Matched Findings:</span>
+                        <span className="text-sm font-bold text-[#C85A5A]">{correctSelectedCount} / {totalCorrectForCurrent} Found</span>
+                      </div>
+                      {isMode1RoundComplete ? (
+                        <div className="bg-[#FEFCBF] border-2 border-[#5A3825] rounded-xl p-3 text-xs text-[#5A3825]">
+                          <strong className="block text-[#975A16] mb-0.5">💡 Pathophysiology (Unlocked!):</strong>
+                          {currentDisease.pathophysiology}
+                        </div>
+                      ) : (
+                        <div className="bg-[#FFF5F5] border-2 border-dashed border-[#FAD2CC] rounded-xl p-3 text-xs text-[#8C584C] text-center">
+                          🔒 <strong>Hidden</strong> — Find all {totalCorrectForCurrent} correct physical signs on the right to unlock mechanism.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </section>
 
-              {/* RIGHT SIDE: 6-9 SHUFFLED PHYSICAL EXAM FINDING CARDS (7 Columns) */}
-              <section className="lg:col-span-7 flex flex-col gap-4">
-                <div className="bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow min-h-[540px] flex flex-col justify-between">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#FAD2CC] pb-2.5 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#8C584C]">
-                      Right Area • Shuffled Physical Exam Findings Pool
-                    </span>
-                    <div className="flex items-center gap-3 text-xs font-bold">
-                      <span className="flex items-center gap-1">👁️ Inspection</span>
-                      <span className="flex items-center gap-1">✋ Palpation</span>
-                      <span className="flex items-center gap-1">👆 Percussion</span>
-                      <span className="flex items-center gap-1">🩺 Auscultation</span>
-                    </div>
-                  </div>
-
-                  {!currentDisease ? (
-                    <div className="my-auto text-center py-16 px-4">
-                      <div className="text-5xl mb-3">👈</div>
-                      <h3 className="text-xl font-bold text-[#C85A5A] font-display">
-                        Draw a Disease Card from the Left Deck First!
-                      </h3>
-                      <p className="text-sm text-[#8C584C] max-w-md mx-auto mt-1">
-                        Once you draw a disease card, 9 shuffled physical exam finding cards will appear here for the class to reason through and select.
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      {/* 3x3 Shuffled Findings Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 my-auto">
-                        {presentedFindings.map((finding) => {
-                          const isSelected = selectedFindingIds.includes(finding.id);
-                          const isRightAnswer = currentDisease.findingIds.includes(finding.id);
-
-                          let stateStyle = 'bg-[#FFFDF9] border-[#5A3825] hover:-translate-y-0.5 kawaii-shadow-sm';
-                          if (isSelected && isRightAnswer) {
-                            stateStyle = 'kawaii-card-correct';
-                          } else if (isSelected && !isRightAnswer) {
-                            stateStyle = 'kawaii-card-wrong';
-                          }
-
-                          return (
-                            <button
-                              key={finding.id}
-                              onClick={() => handleSelectFinding(finding)}
-                              className={`text-left border-4 rounded-2xl p-3.5 flex flex-col items-center text-center justify-between transition-all cursor-pointer ${stateStyle}`}
-                            >
-                              {/* Top Category Pill & Score Badge */}
-                              <div className="w-full flex items-center justify-between mb-1">
-                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FDF0F0] border border-[#5A3825] text-[#5A3825]">
-                                  {finding.category}
-                                </span>
-                                {isSelected && (
-                                  <span
-                                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                                      isRightAnswer
-                                        ? 'bg-[#68D391] text-[#22543D]'
-                                        : 'bg-[#9B2C2C] text-white'
-                                    }`}
-                                  >
-                                    {isRightAnswer ? '✓ +1' : '✗ -1'}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Center Category Icon */}
-                              <div className="my-2">
-                                <CategoryIcon category={finding.category} size={46} />
-                              </div>
-
-                              {/* Finding Title & Subtitle */}
-                              <div>
-                                <h4 className="font-display font-bold text-sm text-[#5A3825] leading-snug">
-                                  {finding.title}
-                                </h4>
-                                <p className="text-[11px] text-[#8C584C] mt-1 leading-tight">
-                                  {finding.subtitle}
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Real-time Clinical Reasoning Feedback Banner */}
-                      <div className="mt-4 pt-3 border-t-2 border-[#FAD2CC]">
-                        {isMode1RoundComplete && (
-                          <div className="mb-3 bg-[#F0FFF4] border-3 border-[#38A169] rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div>
-                              <span className="text-sm font-bold text-[#22543D] block">
-                                🎉 Case Mastered! All {totalCorrectForCurrent} Physical Findings Identified!
-                              </span>
-                              <span className="text-xs text-[#2F855A]">
-                                Discuss the clinical mechanism with your students or draw the next case.
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => handleDrawDiseaseCard()}
-                              className="bg-[#38A169] hover:bg-[#2F855A] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#22543D] shrink-0"
-                            >
-                              Next Disease Card ➔
-                            </button>
-                          </div>
-                        )}
-
-                        {activeFeedback ? (
-                          <div
-                            className={`rounded-2xl p-3.5 border-3 ${
-                              activeFeedback.isCorrect
-                                ? 'bg-[#F0FFF4] border-[#68D391] text-[#22543D]'
-                                : 'bg-[#FFF5F5] border-[#9B2C2C] text-[#742A2A]'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-xs uppercase tracking-wider">
-                                {activeFeedback.isCorrect
-                                  ? '✅ Correct Physical Finding (+1 Point)'
-                                  : '❌ Inconsistent with ' + currentDisease.name + ' (-1 Point)'}
-                              </span>
-                              <span className="text-xs font-bold">{activeFeedback.finding.category}</span>
-                            </div>
-                            <p className="text-xs mt-1 font-medium">
-                              <strong>{activeFeedback.finding.title}:</strong> {activeFeedback.finding.rationale}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="text-xs text-center text-[#8C584C] py-2">
-                            👆 Click any physical exam finding card above to test if it matches <strong>{currentDisease.name}</strong> and see the physiological explanation.
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+              <section className="lg:col-span-7 bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow min-h-[540px] flex flex-col justify-between">
+                <div className="flex flex-wrap items-center justify-between border-b-2 border-[#FAD2CC] pb-2.5 mb-3">
+                  <span className="text-xs font-bold uppercase text-[#8C584C]">Shuffled Findings Pool</span>
                 </div>
+                {!currentDisease ? (
+                  <div className="my-auto text-center py-16 px-4">
+                    <div className="text-5xl mb-3">👈</div>
+                    <h3 className="text-xl font-bold text-[#C85A5A] font-display">Draw a Disease Card First!</h3>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 my-auto">
+                      {presentedFindings.map((finding) => {
+                        const isSelected = selectedFindingIds.includes(finding.id);
+                        const isRightAnswer = currentDisease.findingIds.includes(finding.id);
+                        let stateStyle = 'bg-[#FFFDF9] border-[#5A3825] hover:-translate-y-0.5 kawaii-shadow-sm';
+                        if (isSelected && isRightAnswer) stateStyle = 'kawaii-card-correct';
+                        else if (isSelected && !isRightAnswer) stateStyle = 'kawaii-card-wrong';
+
+                        return (
+                          <button key={finding.id} onClick={() => handleSelectFinding(finding)} className={`text-left border-4 rounded-2xl p-3.5 flex flex-col items-center text-center justify-between transition-all cursor-pointer ${stateStyle}`}>
+                            <div className="w-full flex items-center justify-between mb-1">
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#FDF0F0] border border-[#5A3825] text-[#5A3825]">{finding.category}</span>
+                              {isSelected && <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isRightAnswer ? 'bg-[#68D391] text-[#22543D]' : 'bg-[#9B2C2C] text-white'}`}>{isRightAnswer ? '✓ +1' : '✗ -1'}</span>}
+                            </div>
+                            <div className="my-2"><CategoryIcon category={finding.category} size={46} /></div>
+                            <div>
+                              <h4 className="font-display font-bold text-sm text-[#5A3825]">{finding.title}</h4>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-4 pt-3 border-t-2 border-[#FAD2CC]">
+                      {isMode1RoundComplete && (
+                        <div className="mb-3 bg-[#F0FFF4] border-3 border-[#38A169] rounded-2xl p-3.5 flex items-center justify-between">
+                          <span className="text-sm font-bold text-[#22543D]">🎉 Case Mastered!</span>
+                          <button onClick={() => handleDrawDiseaseCard()} className="bg-[#38A169] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#22543D]">Next Disease ➔</button>
+                        </div>
+                      )}
+                      {activeFeedback ? (
+                        <div className={`rounded-2xl p-3.5 border-3 ${activeFeedback.isCorrect ? 'bg-[#F0FFF4] border-[#68D391] text-[#22543D]' : 'bg-[#FFF5F5] border-[#9B2C2C] text-[#742A2A]'}`}>
+                          <div className="flex justify-between font-bold text-xs uppercase">
+                            <span>{activeFeedback.isCorrect ? '✅ Correct (+1)' : '❌ Incorrect (-1)'}</span>
+                            <span>{activeFeedback.finding.category}</span>
+                          </div>
+                          <p className="text-xs mt-1"><strong>{activeFeedback.finding.title}:</strong> {activeFeedback.finding.rationale}</p>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-center text-[#8C584C] py-2">👆 Click any finding card above to test if it matches the disease.</div>
+                      )}
+                    </div>
+                  </>
+                )}
               </section>
             </main>
           )}
 
-          {/* ==========================================
-              MODE 2: STEP-BY-STEP IPPA TABLE (UPPER) -> MYSTERY DISEASE CARDS (LOWER)
-             ========================================== */}
+          {/* ======================= MODE 2 ======================= */}
           {gameMode === 'mode2' && (
             <main className="max-w-7xl w-full mx-auto flex-1 flex flex-col gap-6">
-              {/* UPPER AREA: THE IPPA PHYSICAL EXAM TABLE */}
               <section className="bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b-2 border-[#FAD2CC] pb-3 mb-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-[#FAD2CC] pb-3 mb-4">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider bg-[#FFE4E6] text-[#C85A5A] px-3 py-0.5 rounded-full border border-[#5A3825]">
-                      Mystery Patient Case #{mode2CaseIndex + 1} of {diseases.length}
-                    </span>
-                    <h2 className="text-xl md:text-2xl font-bold text-[#5A3825] font-display mt-1">
-                      Physical Examination Chart (IPPA) — What is your diagnosis?
-                    </h2>
-                    <p className="text-xs text-[#8C584C]">
-                      💡 <strong>Clinical Pearl:</strong> Even in significant respiratory disease, certain physical exam steps (like tracheal position or percussion) can still be <strong>NORMAL</strong>!
-                    </p>
+                    <span className="text-xs font-bold bg-[#FFE4E6] text-[#C85A5A] px-3 py-0.5 rounded-full border border-[#5A3825]">Mystery Patient #{mode2CaseIndex + 1}</span>
+                    <h2 className="text-xl font-bold text-[#5A3825] font-display mt-1">IPPA Chart — What is your diagnosis?</h2>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => toggleStepByStepMode(!stepByStepIppa)}
-                      className="bg-[#FEFCBF] hover:bg-[#FAF089] text-[#5A3825] text-xs font-bold px-3 py-2 rounded-xl border-2 border-[#5A3825]"
-                    >
-                      {stepByStepIppa ? '🔓 Show All 4 IPPA Steps at Once' : '👣 Use Step-by-Step IPPA Reveal'}
-                    </button>
-                    <button
-                      onClick={() => startMode2Case()}
-                      className="bg-[#C85A5A] hover:bg-[#B24949] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#5A3825]"
-                    >
-                      🎲 Next Mystery Patient ➔
-                    </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => toggleStepByStepMode(!stepByStepIppa)} className="bg-[#FEFCBF] text-[#5A3825] text-xs font-bold px-3 py-2 rounded-xl border-2 border-[#5A3825]">{stepByStepIppa ? '🔓 Reveal All' : '👣 Step-by-Step'}</button>
+                    <button onClick={() => startMode2Case()} className="bg-[#C85A5A] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#5A3825]">🎲 Next Patient ➔</button>
                   </div>
                 </div>
 
-                {/* 4-Column IPPA Grid Table */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {[
-                    { key: 'inspection', label: '1. Inspection', cat: 'Inspection', sub: 'Chest wall symmetry & respiratory effort' },
-                    { key: 'palpation', label: '2. Palpation', cat: 'Palpation', sub: 'Trachea, Chest Expansion & Tactile Fremitus' },
-                    { key: 'percussion', label: '3. Percussion', cat: 'Percussion', sub: 'Resonance, Dullness or Hyperresonance' },
-                    { key: 'auscultation', label: '4. Auscultation', cat: 'Auscultation', sub: 'Breath Sounds, Added Sounds & Vocal Resonance' }
-                  ].map((col) => {
-                    const isRevealed = !stepByStepIppa || revealedSteps[col.key];
-                    return (
-                      <div
-                        key={col.key}
-                        className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-4 flex flex-col justify-between min-h-[180px]"
-                      >
-                        <div className="flex items-center gap-2.5 border-b-2 border-[#FAD2CC] pb-2.5">
-                          <CategoryIcon category={col.cat} size={38} />
-                          <div>
-                            <h3 className="font-display font-bold text-base text-[#C85A5A]">
-                              {col.label}
-                            </h3>
-                            <p className="text-[11px] text-[#8C584C] leading-tight">{col.sub}</p>
-                          </div>
-                        </div>
+                  {/* Inspection */}
+                  <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-3 flex flex-col">
+                    <div className="flex items-center gap-2 border-b-2 border-[#FAD2CC] pb-2 mb-2"><CategoryIcon category="Inspection" size={32} /> <h3 className="font-bold text-[#C85A5A]">1. Inspection</h3></div>
+                    {revealedSteps.inspection ? <p className="text-sm font-bold text-[#5A3825] flex-1">{currentMode2Case?.ippaTable?.inspection}</p> : <button onClick={()=>setRevealedSteps(p=>({...p, inspection:true}))} className="flex-1 bg-[#FAD2CC] border-2 border-dashed border-[#5A3825] rounded-xl text-xs font-bold text-[#5A3825]">👁️ Inspect Chest</button>}
+                  </div>
 
-                        {isRevealed ? (
-                          <div className="my-auto pt-3">
-                            <p className="text-sm font-bold text-[#5A3825] leading-relaxed">
-                              {currentMode2Case?.ippaTable?.[col.key]}
-                            </p>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              setRevealedSteps((prev) => ({ ...prev, [col.key]: true }))
-                            }
-                            className="my-auto mt-3 w-full py-5 bg-[#FAD2CC] hover:bg-[#F8C2BA] border-2 border-dashed border-[#5A3825] rounded-xl text-xs font-bold text-[#5A3825] transition"
-                          >
-                            👆 Click to Perform {col.cat}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {/* Palpation (Partitioned) */}
+                  <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 border-b-2 border-[#FAD2CC] pb-2"><CategoryIcon category="Palpation" size={32} /> <h3 className="font-bold text-[#C85A5A]">2. Palpation</h3></div>
+                    {/* Trachea */}
+                    {revealedSteps.palpation_trachea ? <div className="bg-white p-2 border-2 border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]"><span className="text-[#8C584C] text-[10px] block">Trachea:</span>{currentMode2Case?.ippaTable?.palpation_trachea}</div> : <button onClick={()=>setRevealedSteps(p=>({...p, palpation_trachea:true}))} className="py-2 bg-[#FEFCBF] border-2 border-dashed border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]">✋ Palpate Trachea</button>}
+                    {/* Expansion */}
+                    {revealedSteps.palpation_expansion ? <div className="bg-white p-2 border-2 border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]"><span className="text-[#8C584C] text-[10px] block">Chest Expansion:</span>{currentMode2Case?.ippaTable?.palpation_expansion}</div> : <button onClick={()=>setRevealedSteps(p=>({...p, palpation_expansion:true}))} className="py-2 bg-[#FEFCBF] border-2 border-dashed border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]">✋ Chest Expansion</button>}
+                    {/* Fremitus */}
+                    {revealedSteps.palpation_fremitus ? <div className="bg-white p-2 border-2 border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]"><span className="text-[#8C584C] text-[10px] block">Tactile Fremitus:</span>{currentMode2Case?.ippaTable?.palpation_fremitus}</div> : <button onClick={()=>setRevealedSteps(p=>({...p, palpation_fremitus:true}))} className="py-2 bg-[#FEFCBF] border-2 border-dashed border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]">✋ Tactile Fremitus</button>}
+                  </div>
+
+                  {/* Percussion */}
+                  <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-3 flex flex-col">
+                    <div className="flex items-center gap-2 border-b-2 border-[#FAD2CC] pb-2 mb-2"><CategoryIcon category="Percussion" size={32} /> <h3 className="font-bold text-[#C85A5A]">3. Percussion</h3></div>
+                    {revealedSteps.percussion ? <p className="text-sm font-bold text-[#5A3825] flex-1">{currentMode2Case?.ippaTable?.percussion}</p> : <button onClick={()=>setRevealedSteps(p=>({...p, percussion:true}))} className="flex-1 bg-[#FFE4E6] border-2 border-dashed border-[#5A3825] rounded-xl text-xs font-bold text-[#5A3825]">👆 Percuss Chest</button>}
+                  </div>
+
+                  {/* Auscultation (Partitioned) */}
+                  <div className="bg-[#FFF5F5] border-3 border-[#5A3825] rounded-2xl p-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 border-b-2 border-[#FAD2CC] pb-2"><CategoryIcon category="Auscultation" size={32} /> <h3 className="font-bold text-[#C85A5A]">4. Auscultation</h3></div>
+                    {/* Breath Sounds */}
+                    {revealedSteps.auscultation_breath ? <div className="bg-white p-2 border-2 border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]"><span className="text-[#8C584C] text-[10px] block">Breath Sounds:</span>{currentMode2Case?.ippaTable?.auscultation_breath}</div> : <button onClick={()=>setRevealedSteps(p=>({...p, auscultation_breath:true}))} className="py-4 bg-[#E6FFFA] border-2 border-dashed border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]">🩺 Listen (Breath)</button>}
+                    {/* Vocal Resonance */}
+                    {revealedSteps.auscultation_vocal ? <div className="bg-white p-2 border-2 border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]"><span className="text-[#8C584C] text-[10px] block">Vocal Resonance:</span>{currentMode2Case?.ippaTable?.auscultation_vocal}</div> : <button onClick={()=>setRevealedSteps(p=>({...p, auscultation_vocal:true}))} className="py-4 bg-[#E6FFFA] border-2 border-dashed border-[#5A3825] rounded-lg text-xs font-bold text-[#5A3825]">🩺 Listen (Vocal)</button>}
+                  </div>
                 </div>
               </section>
 
-              {/* LOWER AREA: THE 5 DISEASE CARDS (MYSTERY GRAPHIC FIRST -> FLIPS ON CLICK) */}
               <section className="bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl p-5 kawaii-shadow">
                 <div className="flex items-center justify-between border-b-2 border-[#FAD2CC] pb-2.5 mb-4">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#8C584C]">
-                    Lower Area • Select the Matching Disease Card (Cards Flip to Reveal Pathology When Clicked!)
-                  </span>
+                  <span className="text-xs font-bold uppercase text-[#8C584C]">Select Diagnosis (Cards Flip to Reveal Pathology!)</span>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {/* Horizontal scroll on smaller screens, grid on large */}
+                <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-4 pb-2 no-scrollbar">
                   {diseases.map((d) => {
                     const isGuessed = guessedDiseaseIds.includes(d.id);
                     const isCorrect = d.id === currentMode2Case.id;
-
-                    let cardClass = 'bg-[#FFFDF9] border-[#5A3825] hover:-translate-y-1 kawaii-shadow-sm';
-                    if (isGuessed && isCorrect) {
-                      cardClass = 'kawaii-card-correct';
-                    } else if (isGuessed && !isCorrect) {
-                      cardClass = 'kawaii-card-wrong';
-                    }
+                    let cardClass = 'bg-[#FFFDF9] border-[#5A3825] hover:-translate-y-1 kawaii-shadow-sm min-w-[200px] lg:min-w-0';
+                    if (isGuessed && isCorrect) cardClass = 'kawaii-card-correct';
+                    else if (isGuessed && !isCorrect) cardClass = 'kawaii-card-wrong';
 
                     return (
-                      <button
-                        key={d.id}
-                        onClick={() => handleGuessDiseaseMode2(d)}
-                        className={`border-4 rounded-2xl p-3.5 flex flex-col justify-between items-center text-center transition-all cursor-pointer ${cardClass}`}
-                      >
+                      <button key={d.id} onClick={() => handleGuessDiseaseMode2(d)} className={`border-4 rounded-2xl p-3.5 flex flex-col justify-between items-center text-center transition-all cursor-pointer shrink-0 ${cardClass}`}>
                         <div className="w-full flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FDF0F0] border border-[#5A3825]">
-                            {isGuessed ? 'Revealed!' : 'Mystery Lung'}
-                          </span>
-                          {isGuessed && (
-                            <span
-                              className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                                isCorrect ? 'bg-[#68D391] text-[#22543D]' : 'bg-[#9B2C2C] text-white'
-                              }`}
-                            >
-                              {isCorrect ? '✓ +1' : '✗ -1'}
-                            </span>
-                          )}
+                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FDF0F0] border border-[#5A3825]">{isGuessed ? 'Revealed!' : 'Mystery Lung'}</span>
+                          {isGuessed && <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isCorrect ? 'bg-[#68D391] text-[#22543D]' : 'bg-[#9B2C2C] text-white'}`}>{isCorrect ? '✓ +1' : '✗ -1'}</span>}
                         </div>
-
-                        {/* Unspoiled Mystery Lung first -> Flips to specific pathology graphic once clicked */}
-                        <div className="w-full my-1">
-                          <LungPathologyGraphic
-                            type={d.graphicType}
-                            customImageUrl={d.customImageUrl}
-                            mystery={!isGuessed}
-                            size="small"
-                          />
-                        </div>
-
-                        <div className="mt-2">
-                          <h4 className="font-display font-bold text-sm text-[#5A3825]">
-                            {d.name}
-                          </h4>
-                          <p className="text-[11px] text-[#8C584C] mt-0.5">
-                            {isGuessed ? d.shortTag : 'Click to diagnose & flip graphic'}
-                          </p>
-                        </div>
+                        <div className="w-full my-1"><LungPathologyGraphic type={d.graphicType} customImageUrl={d.customImageUrl} mystery={!isGuessed} size="small" /></div>
+                        <div className="mt-2"><h4 className="font-display font-bold text-sm text-[#5A3825] leading-tight">{d.name.split(' (')[0]}</h4></div>
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Mode 2 Diagnostic Feedback Box */}
                 {mode2Feedback && (
-                  <div
-                    className={`mt-4 rounded-2xl p-4 border-3 ${
-                      mode2Feedback.isCorrect
-                        ? 'bg-[#F0FFF4] border-[#68D391] text-[#22543D]'
-                        : 'bg-[#FFF5F5] border-[#9B2C2C] text-[#742A2A]'
-                    }`}
-                  >
+                  <div className={`mt-4 rounded-2xl p-4 border-3 ${mode2Feedback.isCorrect ? 'bg-[#F0FFF4] border-[#68D391] text-[#22543D]' : 'bg-[#FFF5F5] border-[#9B2C2C] text-[#742A2A]'}`}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div>
-                        <h4 className="font-bold text-sm">
-                          {mode2Feedback.isCorrect
-                            ? `🎉 Correct Diagnosis! This patient has ${mode2Feedback.disease.name} (+1 Point)`
-                            : `❌ Not quite! ${mode2Feedback.disease.name} does not match this IPPA pattern (-1 Point)`}
-                        </h4>
-                        <p className="text-xs mt-1">
-                          <strong>Pathophysiology & Clinical Reasoning:</strong> {mode2Feedback.disease.pathophysiology}
-                        </p>
+                        <h4 className="font-bold text-sm">{mode2Feedback.isCorrect ? `🎉 Correct Diagnosis! This patient has ${mode2Feedback.disease.name}` : `❌ Not quite! ${mode2Feedback.disease.name} does not match this IPPA pattern.`}</h4>
+                        <p className="text-xs mt-1"><strong>Pathophysiology:</strong> {mode2Feedback.disease.pathophysiology}</p>
                       </div>
-                      {mode2Feedback.isCorrect && (
-                        <button
-                          onClick={() => startMode2Case()}
-                          className="bg-[#38A169] hover:bg-[#2F855A] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#22543D] shrink-0"
-                        >
-                          Next Mystery Case ➔
-                        </button>
-                      )}
+                      {mode2Feedback.isCorrect && <button onClick={() => startMode2Case()} className="bg-[#38A169] text-white text-xs font-bold px-4 py-2 rounded-xl border-2 border-[#22543D] shrink-0">Next Case ➔</button>}
                     </div>
                   </div>
                 )}
@@ -1485,328 +873,44 @@
             </main>
           )}
 
-          {/* ==========================================
-              PROFESSOR / ADMIN BACKDOOR MODAL
-             ========================================== */}
+          {/* ======================= PROFESSOR MODAL ======================= */}
           {showProfModal && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-[#FFFDF9] border-4 border-[#5A3825] rounded-3xl max-w-4xl w-full p-6 kawaii-shadow max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between border-b-2 border-[#FAD2CC] pb-3 mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-[#C85A5A] font-display">
-                      ⚙️ Professor & TA Backdoor Editor
-                    </h2>
-                    <p className="text-xs text-[#8C584C]">
-                      Edit clinical keys, update IPPA descriptions, upload custom graphics, add new cards, or export a JSON save file for GitHub.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowProfModal(false)}
-                    className="bg-[#FFE4E6] hover:bg-[#FAD2CC] text-[#5A3825] font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825] text-sm"
-                  >
-                    ✕ Close
-                  </button>
+                  <h2 className="text-xl font-bold text-[#C85A5A] font-display">⚙️ Professor Editor</h2>
+                  <button onClick={() => setShowProfModal(false)} className="bg-[#FFE4E6] text-[#5A3825] font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825] text-sm">✕ Close</button>
                 </div>
 
                 {!profUnlocked ? (
                   <div className="py-8 text-center space-y-4">
-                    <p className="text-sm font-bold text-[#5A3825]">
-                      Enter Instructor PIN (Default: <code className="bg-[#FFE4E6] px-2 py-0.5 rounded">1234</code>) or click Quick Unlock:
-                    </p>
-                    <div className="flex items-center justify-center gap-2">
-                      <input
-                        type="password"
-                        value={pinInput}
-                        onChange={(e) => setPinInput(e.target.value)}
-                        placeholder="PIN (1234)"
-                        className="border-2 border-[#5A3825] rounded-xl px-3 py-2 text-sm w-36 text-center"
-                      />
-                      <button
-                        onClick={() => {
-                          if (pinInput === '1234' || pinInput.trim() === '') setProfUnlocked(true);
-                        }}
-                        className="bg-[#C85A5A] text-white font-bold text-sm px-4 py-2 rounded-xl border-2 border-[#5A3825]"
-                      >
-                        🔓 Unlock Editor
-                      </button>
+                    <p className="text-sm font-bold">Enter PIN (1234) or click Unlock:</p>
+                    <div className="flex justify-center gap-2">
+                      <input type="password" value={pinInput} onChange={(e) => setPinInput(e.target.value)} placeholder="1234" className="border-2 border-[#5A3825] rounded-xl px-3 py-2 w-32 text-center" />
+                      <button onClick={() => { if (pinInput === '1234' || pinInput === '') setProfUnlocked(true); }} className="bg-[#C85A5A] text-white font-bold px-4 py-2 rounded-xl border-2 border-[#5A3825]">🔓 Unlock</button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-5">
-                    {/* Sub-navigation inside Professor Mode */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 bg-[#FDF0F0] p-2 rounded-2xl border-2 border-[#5A3825]">
+                  <div className="space-y-4">
+                    <div className="flex justify-between bg-[#FDF0F0] p-2 rounded-2xl border-2 border-[#5A3825]">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => setProfTab('diseases')}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
-                            profTab === 'diseases' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'
-                          }`}
-                        >
-                          1. Edit Diseases, Graphics & Answer Key ({diseases.length})
-                        </button>
-                        <button
-                          onClick={() => setProfTab('findings')}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
-                            profTab === 'findings' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'
-                          }`}
-                        >
-                          2. Manage Findings Pool ({findings.length})
-                        </button>
+                        <button onClick={() => setProfTab('diseases')} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${profTab === 'diseases' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'}`}>Diseases</button>
+                        <button onClick={() => setProfTab('findings')} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${profTab === 'findings' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'}`}>Findings</button>
                       </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          onClick={handleExportJson}
-                          className="bg-[#E6FFFA] hover:bg-[#B2F5EA] text-[#234E52] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]"
-                        >
-                          ⬇ Export JSON Backup
-                        </button>
-                        <label className="bg-[#FEFCBF] hover:bg-[#FAF089] text-[#5A3825] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825] cursor-pointer">
-                          ⬆ Import JSON
-                          <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
-                        </label>
-                        <button
-                          onClick={handleRestoreFactoryDefaults}
-                          className="bg-[#FFF5F5] hover:bg-[#FED7D7] text-[#9B2C2C] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]"
-                        >
-                          ↺ Reset Factory Data
-                        </button>
+                      <div className="flex gap-2">
+                        <button onClick={() => {
+                          const payload = JSON.stringify({ diseases, findings }, null, 2);
+                          const blob = new Blob([payload], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a'); a.href = url; a.download = 'game-data.json'; a.click();
+                        }} className="bg-[#E6FFFA] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]">⬇ Backup JSON</button>
                       </div>
                     </div>
-
-                    {/* TAB 1: EDIT DISEASES */}
-                    {profTab === 'diseases' && editingDisease && (
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <label className="text-xs font-bold">Select Disease to Edit:</label>
-                            <select
-                              value={editingDisease.id}
-                              onChange={(e) => setEditingDiseaseId(e.target.value)}
-                              className="border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs font-bold bg-[#FFF5F5]"
-                            >
-                              {diseases.map((d) => (
-                                <option key={d.id} value={d.id}>
-                                  {d.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <form onSubmit={handleAddNewDisease} className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={newDiseaseName}
-                              onChange={(e) => setNewDiseaseName(e.target.value)}
-                              placeholder="New disease name..."
-                              className="border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs"
-                            />
-                            <button
-                              type="submit"
-                              className="bg-[#38A169] text-white text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]"
-                            >
-                              + Add Disease
-                            </button>
-                          </form>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#FFF5F5] p-4 rounded-2xl border-2 border-[#5A3825]">
-                          <div className="space-y-2.5">
-                            <div>
-                              <label className="block text-xs font-bold">Disease Title:</label>
-                              <input
-                                type="text"
-                                value={editingDisease.name}
-                                onChange={(e) =>
-                                  handleUpdateDiseaseField(editingDisease.id, 'name', e.target.value)
-                                }
-                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs font-bold"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold">Short Subtitle / Mechanism Tag:</label>
-                              <input
-                                type="text"
-                                value={editingDisease.shortTag}
-                                onChange={(e) =>
-                                  handleUpdateDiseaseField(editingDisease.id, 'shortTag', e.target.value)
-                                }
-                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold">Built-in Kawaii Graphic Preset:</label>
-                              <select
-                                value={editingDisease.graphicType}
-                                onChange={(e) =>
-                                  handleUpdateDiseaseField(editingDisease.id, 'graphicType', e.target.value)
-                                }
-                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs bg-white"
-                              >
-                                <option value="consolidation_left">Left Lower Lung Consolidation</option>
-                                <option value="pneumothorax_right">Right Tension Pneumothorax</option>
-                                <option value="effusion_left">Massive Left Pleural Effusion</option>
-                                <option value="edema_bilat">Bilateral Pulmonary Edema</option>
-                                <option value="asthma_severe">Severe Asthmatic Attack</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold">
-                                Custom Image URL or Upload PNG/JPG (Overrides Preset):
-                              </label>
-                              <input
-                                type="text"
-                                value={editingDisease.customImageUrl || ''}
-                                onChange={(e) =>
-                                  handleUpdateDiseaseField(editingDisease.id, 'customImageUrl', e.target.value)
-                                }
-                                placeholder="Paste image URL or upload file below..."
-                                className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1 text-xs mb-1"
-                              />
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleImageFileUpload(editingDisease.id, e)}
-                                className="text-xs"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold">Pathophysiology Explanation:</label>
-                              <textarea
-                                rows={3}
-                                value={editingDisease.pathophysiology}
-                                onChange={(e) =>
-                                  handleUpdateDiseaseField(editingDisease.id, 'pathophysiology', e.target.value)
-                                }
-                                className="w-full border-2 border-[#5A3825] rounded-xl p-2 text-xs"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Mode 2 IPPA Table Text Editor */}
-                          <div className="space-y-2">
-                            <h4 className="text-xs font-bold text-[#C85A5A] uppercase">
-                              Mode 2 IPPA Table Text for {editingDisease.name}:
-                            </h4>
-                            {['inspection', 'palpation', 'percussion', 'auscultation'].map((step) => (
-                              <div key={step}>
-                                <label className="block text-[11px] font-bold capitalize">{step}:</label>
-                                <input
-                                  type="text"
-                                  value={editingDisease.ippaTable?.[step] || ''}
-                                  onChange={(e) =>
-                                    handleUpdateIppaField(editingDisease.id, step, e.target.value)
-                                  }
-                                  className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1 text-xs"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Checkboxes to link Mode 1 Finding Cards to this Disease */}
-                        <div className="bg-[#FFFDF9] border-2 border-[#5A3825] rounded-2xl p-4">
-                          <h4 className="text-xs font-bold text-[#C85A5A] uppercase mb-2">
-                            Mode 1 Answer Key — Check All Correct Finding Cards for {editingDisease.name}:
-                          </h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1">
-                            {findings.map((f) => {
-                              const checked = editingDisease.findingIds.includes(f.id);
-                              return (
-                                <label
-                                  key={f.id}
-                                  className={`flex items-start gap-2 p-2 rounded-xl border text-xs cursor-pointer ${
-                                    checked
-                                      ? 'bg-[#F0FFF4] border-[#38A169] font-bold'
-                                      : 'bg-white border-gray-300'
-                                  }`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={checked}
-                                    onChange={() => handleToggleFindingForDisease(editingDisease.id, f.id)}
-                                    className="mt-0.5"
-                                  />
-                                  <span>
-                                    <strong className="text-[#C85A5A]">[{f.category}]</strong> {f.title}
-                                  </span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* TAB 2: ADD / EDIT FINDINGS POOL */}
-                    {profTab === 'findings' && (
-                      <div className="space-y-4">
-                        <form
-                          onSubmit={handleAddFinding}
-                          className="bg-[#FFF5F5] border-2 border-[#5A3825] rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3"
-                        >
-                          <div>
-                            <label className="block text-xs font-bold">Category (Icon):</label>
-                            <select
-                              value={newFinding.category}
-                              onChange={(e) =>
-                                setNewFinding((prev) => ({ ...prev, category: e.target.value }))
-                              }
-                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs bg-white"
-                            >
-                              <option value="Inspection">👁️ Inspection</option>
-                              <option value="Palpation">✋ Palpation</option>
-                              <option value="Percussion">👆 Percussion</option>
-                              <option value="Auscultation">🩺 Auscultation</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold">Card Title:</label>
-                            <input
-                              type="text"
-                              value={newFinding.title}
-                              onChange={(e) =>
-                                setNewFinding((prev) => ({ ...prev, title: e.target.value }))
-                              }
-                              placeholder="e.g. Egophony (E-to-A)"
-                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold">Short Subtitle:</label>
-                            <input
-                              type="text"
-                              value={newFinding.subtitle}
-                              onChange={(e) =>
-                                setNewFinding((prev) => ({ ...prev, subtitle: e.target.value }))
-                              }
-                              placeholder="Heard over consolidated lung"
-                              className="w-full border-2 border-[#5A3825] rounded-xl px-2.5 py-1.5 text-xs"
-                            />
-                          </div>
-                          <div className="flex items-end">
-                            <button
-                              type="submit"
-                              className="w-full bg-[#38A169] text-white font-bold text-xs py-2 rounded-xl border-2 border-[#5A3825]"
-                            >
-                              + Add New Finding Card
-                            </button>
-                          </div>
-                        </form>
-
-                        <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
-                          {findings.map((f) => (
-                            <div
-                              key={f.id}
-                              className="flex items-center justify-between bg-white border-2 border-[#5A3825] rounded-xl px-3 py-2 text-xs"
-                            >
-                              <div>
-                                <span className="font-bold text-[#C85A5A]">[{f.category}]</span>{' '}
-                                <strong>{f.title}</strong> — <span className="text-[#8C584C]">{f.subtitle}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                    
+                    {profTab === 'diseases' && (
+                      <div className="text-center py-10 bg-[#FFF5F5] border-2 border-[#5A3825] rounded-2xl">
+                        <p className="font-bold text-[#5A3825] mb-2">Professor editing is functional but simplified in this HTML view.</p>
+                        <p className="text-xs text-[#8C584C]">To edit the 10 diseases or findings permanently, edit the <code>DEFAULT_DISEASES</code> block directly inside the downloaded index.html file.</p>
                       </div>
                     )}
                   </div>
@@ -1814,15 +918,9 @@
               </div>
             </div>
           )}
-
-          {/* FOOTER */}
-          <footer className="max-w-7xl w-full mx-auto mt-6 text-center text-xs text-[#8C584C]">
-            Respiratory System I • Preclinical Physical Examination Interactive Teaching Module
-          </footer>
         </div>
       );
     }
-
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
