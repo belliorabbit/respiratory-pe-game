@@ -539,6 +539,126 @@
       const [profTab, setProfTab] = useState('diseases');
       const [editingDiseaseId, setEditingDiseaseId] = useState(diseases[0]?.id || '');
 
+      // New Finding & Disease Form States
+      const [newFinding, setNewFinding] = useState({
+        category: 'Auscultation',
+        title: '',
+        subtitle: '',
+        rationale: ''
+      });
+      const [newDiseaseName, setNewDiseaseName] = useState('');
+
+      // Professor Mode Helper Functions
+      const editingDisease = diseases.find((d) => d.id === editingDiseaseId) || diseases[0];
+
+      const handleToggleFindingForDisease = (diseaseId, findingId) => {
+        setDiseases((prev) =>
+          prev.map((d) => {
+            if (d.id !== diseaseId) return d;
+            const exists = d.findingIds.includes(findingId);
+            const nextIds = exists
+              ? d.findingIds.filter((id) => id !== findingId)
+              : [...d.findingIds, findingId];
+            return { ...d, findingIds: nextIds };
+          })
+        );
+      };
+
+      const handleUpdateDiseaseField = (diseaseId, field, value) => {
+        setDiseases((prev) =>
+          prev.map((d) => (d.id === diseaseId ? { ...d, [field]: value } : d))
+        );
+      };
+
+      const handleUpdateIppaField = (diseaseId, step, value) => {
+        setDiseases((prev) =>
+          prev.map((d) =>
+            d.id === diseaseId
+              ? { ...d, ippaTable: { ...d.ippaTable, [step]: value } }
+              : d
+          )
+        );
+      };
+
+      const handleImageFileUpload = (diseaseId, e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          handleUpdateDiseaseField(diseaseId, 'customImageUrl', reader.result);
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const handleAddFinding = (e) => {
+        e.preventDefault();
+        if (!newFinding.title.trim()) return;
+        const created = {
+          id: 'custom_f_' + Date.now(),
+          category: newFinding.category,
+          title: newFinding.title.trim(),
+          subtitle: newFinding.subtitle.trim() || 'Physical examination finding',
+          rationale: newFinding.rationale.trim() || 'Clinical correlation for this physical sign.'
+        };
+        setFindings((prev) => [...prev, created]);
+        setNewFinding({ category: 'Auscultation', title: '', subtitle: '', rationale: '' });
+      };
+
+      const handleAddNewDisease = (e) => {
+        e.preventDefault();
+        if (!newDiseaseName.trim()) return;
+        const newId = 'disease_' + Date.now();
+        const created = {
+          id: newId,
+          name: newDiseaseName.trim(),
+          shortTag: 'Custom Respiratory Case',
+          graphicType: 'consolidation_left',
+          customImageUrl: '',
+          pathophysiology: 'Describe the underlying pathophysiology and why these physical findings occur.',
+          findingIds: ['palp_trachea_midline'],
+          ippaTable: {
+            inspection: 'Reduced or normal chest wall movement',
+            palpation_trachea: 'Trachea midline (NORMAL)',
+            palpation_expansion: 'Normal or decreased chest expansion',
+            palpation_fremitus: 'Normal, increased, or decreased tactile fremitus',
+            percussion: 'Resonant or dull percussion note',
+            auscultation_breath: 'Breath sounds and adventitious sounds',
+            auscultation_vocal: 'Vocal resonance findings'
+          }
+        };
+        setDiseases((prev) => [...prev, created]);
+        setEditingDiseaseId(newId);
+        setNewDiseaseName('');
+      };
+
+      const handleImportJson = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            if (Array.isArray(parsed.diseases) && Array.isArray(parsed.findings)) {
+              setDiseases(parsed.diseases);
+              setFindings(parsed.findings);
+              alert('Successfully imported clinical database!');
+            }
+          } catch (err) {
+            alert('Invalid JSON file.');
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      const handleRestoreFactoryDefaults = () => {
+        if (window.confirm('Restore factory default 10 diseases and findings?')) {
+          setDiseases(DEFAULT_DISEASES);
+          setFindings(DEFAULT_FINDINGS);
+          localStorage.removeItem('resp_pe_diseases_v3');
+          localStorage.removeItem('resp_pe_findings_v3');
+        }
+      };
+
       const shuffleArray = (arr) => {
         const copy = [...arr];
         for (let i = copy.length - 1; i > 0; i--) {
@@ -897,13 +1017,18 @@
                         <button onClick={() => setProfTab('diseases')} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${profTab === 'diseases' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'}`}>Diseases</button>
                         <button onClick={() => setProfTab('findings')} className={`px-3 py-1.5 rounded-xl text-xs font-bold ${profTab === 'findings' ? 'bg-[#C85A5A] text-white' : 'text-[#5A3825]'}`}>Findings</button>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button onClick={() => {
                           const payload = JSON.stringify({ diseases, findings }, null, 2);
                           const blob = new Blob([payload], { type: 'application/json' });
                           const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a'); a.href = url; a.download = 'game-data.json'; a.click();
-                        }} className="bg-[#E6FFFA] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]">⬇ Backup JSON</button>
+                          const a = document.createElement('a'); a.href = url; a.download = 'respiratory-exam-game-data.json'; a.click();
+                        }} className="bg-[#E6FFFA] hover:bg-[#B2F5EA] text-[#234E52] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]">⬇ Export JSON</button>
+                        <label className="bg-[#FEFCBF] hover:bg-[#FAF089] text-[#5A3825] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825] cursor-pointer">
+                          ⬆ Import JSON
+                          <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
+                        </label>
+                        <button onClick={handleRestoreFactoryDefaults} className="bg-[#FFF5F5] hover:bg-[#FED7D7] text-[#9B2C2C] text-xs font-bold px-3 py-1.5 rounded-xl border-2 border-[#5A3825]">↺ Reset Defaults</button>
                       </div>
                     </div>
                     
