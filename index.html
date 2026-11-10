@@ -1151,10 +1151,16 @@
                           </span>
                         </div>
 
-                        <div className="bg-[#FEFCBF] border-2 border-[#5A3825] rounded-xl p-3 text-xs text-[#5A3825]">
-                          <strong className="block text-[#975A16] mb-0.5">💡 Pathophysiology Mechanism:</strong>
-                          {currentDisease.pathophysiology}
-                        </div>
+                        {isMode1RoundComplete ? (
+                          <div className="bg-[#FEFCBF] border-2 border-[#5A3825] rounded-xl p-3 text-xs text-[#5A3825]">
+                            <strong className="block text-[#975A16] mb-0.5">💡 Pathophysiology Mechanism (Unlocked!):</strong>
+                            {currentDisease.pathophysiology}
+                          </div>
+                        ) : (
+                          <div className="bg-[#FFF5F5] border-2 border-dashed border-[#FAD2CC] rounded-xl p-3 text-xs text-[#8C584C] text-center">
+                            🔒 <strong>Pathophysiology Mechanism Hidden</strong> — Select all {totalCorrectForCurrent} correct physical exam findings on the right to unlock the full mechanism!
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
