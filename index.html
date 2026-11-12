@@ -34,7 +34,7 @@
     const { useState, useEffect, useMemo } = React;
 
     // ==========================================
-    // 10-DISEASE CLINICAL DATABASE 
+    // 10-DISEASE CLINICAL DATABASE (SIMPLIFIED L/R)
     // ==========================================
     const DEFAULT_FINDINGS = [
       // Inspection
@@ -42,57 +42,45 @@
       { id: 'insp_asym_right', category: 'Inspection', title: 'Reduced Right Chest Wall Movement', subtitle: 'Asymmetric lag on the right', rationale: 'Pathology in the right hemithorax prevents normal chest wall excursion.' },
       { id: 'insp_hyperinflation', category: 'Inspection', title: 'Accessory Muscle Use & Hyperinflation', subtitle: 'Barrel-shaped chest', rationale: 'Severe bronchospasm traps air during expiration, requiring accessory muscles.' },
       { id: 'insp_tachypnea_sym', category: 'Inspection', title: 'Tachypnea with Symmetric Movement', subtitle: 'Rapid breathing, equal movement', rationale: 'Diffuse alveolar fluid impairs gas exchange across both lungs equally.' },
-      { id: 'insp_asym_left_upper', category: 'Inspection', title: 'Reduced Left Upper Chest Movement', subtitle: 'Lag over left upper zone', rationale: 'Volume loss or pathology localized to the left upper lobe.' },
-      { id: 'insp_asym_right_lower', category: 'Inspection', title: 'Reduced Right Lower Chest Movement', subtitle: 'Lag over right lower zone', rationale: 'Volume loss or pathology localized to the right lower lobe.' },
-      { id: 'insp_asym_right_upper', category: 'Inspection', title: 'Reduced Right Upper Chest Movement', subtitle: 'Lag over right upper zone', rationale: 'Pathology localized to the right upper lobe restricts expansion.' },
 
       // Palpation - Trachea
       { id: 'palp_trachea_midline', category: 'Palpation', title: 'Normal Midline Trachea', subtitle: 'No mediastinal shift', rationale: 'Conditions like consolidation, moderate effusion, edema, and asthma do not create massive unilateral pressure gradients.' },
-      { id: 'palp_trachea_left_push', category: 'Palpation', title: 'Trachea Shift to the Left', subtitle: 'Pushed away from right', rationale: 'Positive pressure in a right tension pneumothorax pushes the mediastinum to the left.' },
-      { id: 'palp_trachea_left_pull', category: 'Palpation', title: 'Trachea Shift to the Left (Pulled)', subtitle: 'Pulled toward the left', rationale: 'Volume loss from left upper lobe atelectasis pulls the trachea ipsilaterally.' },
+      { id: 'palp_trachea_left_push', category: 'Palpation', title: 'Trachea Shift to the Left', subtitle: 'Pushed away from right', rationale: 'Positive pressure from a massive right effusion or tension pneumothorax pushes the mediastinum to the left.' },
+      { id: 'palp_trachea_left_pull', category: 'Palpation', title: 'Trachea Shift to the Left (Pulled)', subtitle: 'Pulled toward the left', rationale: 'Volume loss from left lung atelectasis pulls the trachea ipsilaterally.' },
       { id: 'palp_trachea_right_push', category: 'Palpation', title: 'Trachea Shift to the Right', subtitle: 'Pushed away from left', rationale: 'Massive left pleural effusion or left tension PTX pushes the mediastinum to the right.' },
-      { id: 'palp_trachea_right_pull', category: 'Palpation', title: 'Trachea Shift to the Right (Pulled)', subtitle: 'Pulled toward the right', rationale: 'Volume loss from right lower lobe atelectasis pulls the trachea ipsilaterally.' },
+      { id: 'palp_trachea_right_pull', category: 'Palpation', title: 'Trachea Shift to the Right (Pulled)', subtitle: 'Pulled toward the right', rationale: 'Volume loss from right lung atelectasis pulls the trachea ipsilaterally.' },
       
       // Palpation - Expansion
       { id: 'palp_exp_dec_left', category: 'Palpation', title: 'Decreased Left Chest Expansion', subtitle: 'Left thumb moves less', rationale: 'Left-sided pathology reduces compliance and volume entry.' },
       { id: 'palp_exp_dec_right', category: 'Palpation', title: 'Decreased Right Chest Expansion', subtitle: 'Right thumb moves less', rationale: 'Right-sided pathology collapses or restricts the right lung.' },
       
-      // Palpation - Fremitus (Lobe/Zone Specific)
-      { id: 'palp_frem_inc_lll', category: 'Palpation', title: 'Increased Left Lower Tactile Fremitus', subtitle: 'Stronger vibrations left lower', rationale: 'Solidified alveolar exudate conducts vibrations better than air.' },
-      { id: 'palp_frem_inc_rul', category: 'Palpation', title: 'Increased Right Upper Tactile Fremitus', subtitle: 'Stronger vibrations right upper', rationale: 'Solidified exudate in the right upper lobe conducts sound efficiently.' },
-      { id: 'palp_frem_dec_right', category: 'Palpation', title: 'Decreased Right Tactile Fremitus', subtitle: 'Absent vibrations right chest', rationale: 'Pleural air or fluid insulates sound transmission to the chest wall.' },
-      { id: 'palp_frem_dec_left', category: 'Palpation', title: 'Decreased Left Tactile Fremitus', subtitle: 'Absent vibrations left chest', rationale: 'Pleural air or fluid insulates sound transmission.' },
-      { id: 'palp_frem_dec_lul', category: 'Palpation', title: 'Decreased Left Upper Tactile Fremitus', subtitle: 'Absent vibrations left upper', rationale: 'Obstructed left upper bronchus prevents sound waves from reaching the chest wall.' },
-      { id: 'palp_frem_dec_rll', category: 'Palpation', title: 'Decreased Right Lower Tactile Fremitus', subtitle: 'Absent vibrations right lower', rationale: 'Obstructed right lower bronchus blocks vibration transmission.' },
+      // Palpation - Fremitus (Generic Left/Right)
+      { id: 'palp_frem_inc_left', category: 'Palpation', title: 'Increased Left Tactile Fremitus', subtitle: 'Stronger vibrations left chest', rationale: 'Solidified alveolar exudate conducts vibrations better than air.' },
+      { id: 'palp_frem_inc_right', category: 'Palpation', title: 'Increased Right Tactile Fremitus', subtitle: 'Stronger vibrations right chest', rationale: 'Solidified alveolar exudate conducts vibrations better than air.' },
+      { id: 'palp_frem_dec_left', category: 'Palpation', title: 'Decreased Left Tactile Fremitus', subtitle: 'Absent vibrations left chest', rationale: 'Pleural air, fluid, or obstructed bronchi prevent sound transmission to the chest wall.' },
+      { id: 'palp_frem_dec_right', category: 'Palpation', title: 'Decreased Right Tactile Fremitus', subtitle: 'Absent vibrations right chest', rationale: 'Pleural air, fluid, or obstructed bronchi prevent sound transmission to the chest wall.' },
 
       // Percussion
-      { id: 'perc_dull_lll', category: 'Percussion', title: 'Left Lower Dullness on Percussion', subtitle: 'Dull note left lower zone', rationale: 'Consolidated exudate replaces air, producing a dull note.' },
-      { id: 'perc_dull_rul', category: 'Percussion', title: 'Right Upper Dullness on Percussion', subtitle: 'Dull note right upper zone', rationale: 'Consolidated exudate in the right upper lobe produces dullness.' },
-      { id: 'perc_dull_lul', category: 'Percussion', title: 'Left Upper Dullness on Percussion', subtitle: 'Dull note left upper zone', rationale: 'Collapsed, airless lung tissue in atelectasis percusses dull.' },
-      { id: 'perc_dull_rll', category: 'Percussion', title: 'Right Lower Dullness on Percussion', subtitle: 'Dull note right lower zone', rationale: 'Collapsed right lower lobe tissue percusses dull.' },
+      { id: 'perc_dull_left', category: 'Percussion', title: 'Left Dullness on Percussion', subtitle: 'Dull note left chest', rationale: 'Consolidated exudate or airless collapsed lung tissue produces a dull note.' },
+      { id: 'perc_dull_right', category: 'Percussion', title: 'Right Dullness on Percussion', subtitle: 'Dull note right chest', rationale: 'Consolidated exudate or airless collapsed lung tissue produces a dull note.' },
       { id: 'perc_stony_left', category: 'Percussion', title: 'Left Stony Dullness on Percussion', subtitle: 'Extremely dull left chest', rationale: 'Dense pleural fluid creates a distinctively flat, stony dull note.' },
-      { id: 'perc_stony_right', category: 'Percussion', title: 'Right Stony Dullness on Percussion', subtitle: 'Extremely dull right chest', rationale: 'Pleural fluid in the right hemithorax produces stony dullness.' },
+      { id: 'perc_stony_right', category: 'Percussion', title: 'Right Stony Dullness on Percussion', subtitle: 'Extremely dull right chest', rationale: 'Dense pleural fluid creates a distinctively flat, stony dull note.' },
       { id: 'perc_tympanic_right', category: 'Percussion', title: 'Right Hyperresonant / Tympanic', subtitle: 'Hollow drum-like sound right', rationale: 'Trapped pleural air under tension vibrates loudly.' },
       { id: 'perc_tympanic_left', category: 'Percussion', title: 'Left Hyperresonant / Tympanic', subtitle: 'Hollow drum-like sound left', rationale: 'Trapped pleural air in the left hemithorax vibrates loudly.' },
       { id: 'perc_normal_bilat', category: 'Percussion', title: 'Normal Resonance on Percussion', subtitle: 'Normal note bilaterally', rationale: 'Air remains the predominant medium in interstitial edema or mild asthma.' },
       { id: 'perc_hyper_bilat', category: 'Percussion', title: 'Normal / Diffuse Hyperresonance', subtitle: 'Resonant to hyperresonant', rationale: 'Diffuse air trapping increases functional residual capacity.' },
 
       // Auscultation
-      { id: 'ausc_bronchial_lll', category: 'Auscultation', title: 'Left Lower Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds left lower', rationale: 'Patent airways surrounded by solid exudate transmit harsh tracheal sounds directly.' },
-      { id: 'ausc_vr_inc_lll', category: 'Auscultation', title: 'Increased Left Lower Vocal Resonance', subtitle: 'Loud voice sounds left lower', rationale: 'Solidified tissue enhances sound transmission.' },
-      { id: 'ausc_bronchial_rul', category: 'Auscultation', title: 'Right Upper Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds right upper', rationale: 'Consolidated right upper lobe transmits sounds directly from patent bronchi.' },
-      { id: 'ausc_vr_inc_rul', category: 'Auscultation', title: 'Increased Right Upper Vocal Resonance', subtitle: 'Loud voice sounds right upper', rationale: 'Consolidation enhances voice sound transmission.' },
+      { id: 'ausc_bronchial_left', category: 'Auscultation', title: 'Left Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds left chest', rationale: 'Patent airways surrounded by solid exudate transmit harsh tracheal sounds directly.' },
+      { id: 'ausc_bronchial_right', category: 'Auscultation', title: 'Right Bronchial Breath Sounds & Crackles', subtitle: 'Harsh tubular sounds right chest', rationale: 'Patent airways surrounded by solid exudate transmit harsh tracheal sounds directly.' },
+      { id: 'ausc_vr_inc_left', category: 'Auscultation', title: 'Increased Left Vocal Resonance', subtitle: 'Loud voice sounds left chest', rationale: 'Solidified tissue enhances sound transmission.' },
+      { id: 'ausc_vr_inc_right', category: 'Auscultation', title: 'Increased Right Vocal Resonance', subtitle: 'Loud voice sounds right chest', rationale: 'Solidified tissue enhances sound transmission.' },
       
-      { id: 'ausc_absent_right', category: 'Auscultation', title: 'Absent Breath Sounds on Right', subtitle: 'Silent right hemithorax', rationale: 'Pleural air/fluid insulates sound, or the lung is collapsed.' },
-      { id: 'ausc_vr_dec_right', category: 'Auscultation', title: 'Decreased Right Vocal Resonance', subtitle: 'Muffled sounds right chest', rationale: 'Pleural air/fluid acts as an acoustic barrier.' },
-      { id: 'ausc_absent_left', category: 'Auscultation', title: 'Decreased / Absent Breath Sounds on Left', subtitle: 'Silent left hemithorax', rationale: 'Pleural fluid/air compresses the lung and blocks sound.' },
-      { id: 'ausc_vr_dec_left', category: 'Auscultation', title: 'Decreased Left Vocal Resonance', subtitle: 'Muffled sounds left chest', rationale: 'Pleural fluid/air insulates acoustic energy.' },
+      { id: 'ausc_absent_left', category: 'Auscultation', title: 'Decreased / Absent Breath Sounds on Left', subtitle: 'Silent left hemithorax', rationale: 'Pleural fluid/air, or a blocked bronchus prevents sound transmission.' },
+      { id: 'ausc_absent_right', category: 'Auscultation', title: 'Decreased / Absent Breath Sounds on Right', subtitle: 'Silent right hemithorax', rationale: 'Pleural fluid/air, or a blocked bronchus prevents sound transmission.' },
+      { id: 'ausc_vr_dec_left', category: 'Auscultation', title: 'Decreased Left Vocal Resonance', subtitle: 'Muffled sounds left chest', rationale: 'Pleural fluid/air insulates acoustic energy, or a blocked airway halts transmission.' },
+      { id: 'ausc_vr_dec_right', category: 'Auscultation', title: 'Decreased Right Vocal Resonance', subtitle: 'Muffled sounds right chest', rationale: 'Pleural fluid/air insulates acoustic energy, or a blocked airway halts transmission.' },
       
-      { id: 'ausc_absent_lul', category: 'Auscultation', title: 'Decreased / Absent Left Upper Breath Sounds', subtitle: 'Diminished sounds left upper', rationale: 'An obstructed bronchus prevents air entry and breath sound generation.' },
-      { id: 'ausc_vr_dec_lul', category: 'Auscultation', title: 'Decreased Left Upper Vocal Resonance', subtitle: 'Muffled left upper zone', rationale: 'Blocked airway prevents vocal sound transmission to the lobe.' },
-      { id: 'ausc_absent_rll', category: 'Auscultation', title: 'Decreased / Absent Right Lower Breath Sounds', subtitle: 'Diminished sounds right lower', rationale: 'Obstructed right lower bronchus halts airflow and sound.' },
-      { id: 'ausc_vr_dec_rll', category: 'Auscultation', title: 'Decreased Right Lower Vocal Resonance', subtitle: 'Muffled right lower zone', rationale: 'Bronchial occlusion blocks sound transmission.' },
-
       { id: 'ausc_fine_crep_bilat', category: 'Auscultation', title: 'Bilateral Fine Late-Inspiratory Crepitations', subtitle: 'Fine basal crackles', rationale: 'Edematous distal airways snap open during late inspiration.' },
       { id: 'ausc_wheeze_bilat', category: 'Auscultation', title: 'Bilateral Expiratory Wheezing', subtitle: 'High-pitched musical wheezes', rationale: 'Airflow through diffusely narrowed small airways creates oscillations.' },
       { id: 'ausc_silent_chest', category: 'Auscultation', title: 'Silent Chest (Life-Threatening Asthma)', subtitle: 'Absent wheezing / airflow', rationale: 'Airflow velocity drops too low to generate audible sounds due to critical obstruction.' }
@@ -100,12 +88,12 @@
 
     const DEFAULT_DISEASES = [
       {
-        id: 'consolidation_lll',
-        name: 'Left Lower Lung Consolidation from Pneumonia',
-        shortTag: 'Lobar Pneumonia (Left Lower)',
+        id: 'consolidation_left',
+        name: 'Left Lung Consolidation (Pneumonia)',
+        shortTag: 'Alveolar Exudate (Left)',
         graphicType: 'consolidation_left',
-        pathophysiology: 'Alveoli in the left lower lobe fill with inflammatory exudate (fluid, WBCs, fibrin) while the conducting airways remain patent. Solidified parenchyma conducts sound waves and vibrations much better than spongy air-filled alveoli, without shifting the mediastinum.',
-        findingIds: ['palp_trachea_midline', 'palp_exp_dec_left', 'palp_frem_inc_lll', 'perc_dull_lll', 'ausc_bronchial_lll', 'ausc_vr_inc_lll'],
+        pathophysiology: 'Alveoli in the left lung fill with inflammatory exudate while the conducting airways remain patent. Solidified parenchyma conducts sound waves and vibrations much better than spongy air-filled alveoli, without shifting the mediastinum.',
+        findingIds: ['palp_trachea_midline', 'palp_exp_dec_left', 'palp_frem_inc_left', 'perc_dull_left', 'ausc_bronchial_left', 'ausc_vr_inc_left'],
         ippaTable: {
           inspection: 'Reduced left chest wall movement (or normal)',
           palpation_trachea: 'Trachea midline (NORMAL)',
@@ -117,12 +105,12 @@
         }
       },
       {
-        id: 'consolidation_rul',
-        name: 'Right Upper Lung Consolidation from Pneumonia',
-        shortTag: 'Lobar Pneumonia (Right Upper)',
-        graphicType: 'consolidation_right_upper',
-        pathophysiology: 'Alveoli in the right upper lobe fill with inflammatory exudate around a patent bronchus, enhancing vocal vibration and transmitting harsh bronchial breath sounds to the right upper chest wall while keeping the trachea midline.',
-        findingIds: ['palp_trachea_midline', 'palp_exp_dec_right', 'palp_frem_inc_rul', 'perc_dull_rul', 'ausc_bronchial_rul', 'ausc_vr_inc_rul'],
+        id: 'consolidation_right',
+        name: 'Right Lung Consolidation (Pneumonia)',
+        shortTag: 'Alveolar Exudate (Right)',
+        graphicType: 'consolidation_right',
+        pathophysiology: 'Alveoli in the right lung fill with inflammatory exudate around a patent bronchus, enhancing vocal vibration and transmitting harsh bronchial breath sounds to the chest wall while keeping the trachea midline.',
+        findingIds: ['palp_trachea_midline', 'palp_exp_dec_right', 'palp_frem_inc_right', 'perc_dull_right', 'ausc_bronchial_right', 'ausc_vr_inc_right'],
         ippaTable: {
           inspection: 'Reduced right chest wall movement (or normal)',
           palpation_trachea: 'Trachea midline (NORMAL)',
@@ -185,15 +173,15 @@
         }
       },
       {
-        id: 'effusion_right',
-        name: 'Right Pleural Effusion (Moderate)',
-        shortTag: 'Pleural Fluid (Right, Midline Trachea)',
-        graphicType: 'effusion_right_mod',
-        pathophysiology: 'Fluid accumulating in the right pleural space separates the lung from the chest wall, producing stony dullness on percussion and muffling tactile fremitus and breath sounds. A moderate effusion does not shift the trachea.',
-        findingIds: ['palp_trachea_midline', 'palp_exp_dec_right', 'palp_frem_dec_right', 'perc_stony_right', 'ausc_absent_right', 'ausc_vr_dec_right'],
+        id: 'effusion_right_massive',
+        name: 'Massive Right Pleural Effusion',
+        shortTag: 'Large Fluid Collection (Right)',
+        graphicType: 'effusion_right',
+        pathophysiology: 'A massive volume of fluid in the right pleural space compresses the right lung, pushes the mediastinum/trachea to the left, and produces stony dullness while muffling tactile fremitus and breath sounds.',
+        findingIds: ['palp_trachea_left_push', 'palp_exp_dec_right', 'palp_frem_dec_right', 'perc_stony_right', 'ausc_absent_right', 'ausc_vr_dec_right'],
         ippaTable: {
           inspection: 'Reduced right chest wall movement',
-          palpation_trachea: 'Trachea midline (NORMAL)',
+          palpation_trachea: 'Trachea shifted to the LEFT (Pushed away)',
           palpation_expansion: 'Decreased right chest expansion',
           palpation_fremitus: 'Decreased/absent right tactile fremitus',
           percussion: 'STONY DULLNESS on right',
@@ -236,12 +224,12 @@
         }
       },
       {
-        id: 'atelectasis_lul',
-        name: 'Left Upper Lobe Atelectasis',
-        shortTag: 'Lobar Collapse / Bronchial Obstruction',
-        graphicType: 'atelectasis_lul',
-        pathophysiology: 'Complete obstruction of the left upper lobe bronchus causes resorption of distal alveolar air and lobar collapse. Volume loss in the left upper hemithorax pulls the trachea ipsilaterally to the left, while the blocked bronchus prevents sound and vibration from reaching the chest wall.',
-        findingIds: ['palp_trachea_left_pull', 'palp_exp_dec_left', 'palp_frem_dec_lul', 'perc_dull_lul', 'ausc_absent_lul', 'ausc_vr_dec_lul'],
+        id: 'atelectasis_left',
+        name: 'Left Lung Atelectasis',
+        shortTag: 'Lung Collapse / Obstruction',
+        graphicType: 'atelectasis_left',
+        pathophysiology: 'Complete obstruction of a left bronchus causes resorption of alveolar air and lung collapse. Volume loss in the left hemithorax pulls the trachea ipsilaterally to the left, while the blocked airway prevents sound and vibration transmission.',
+        findingIds: ['palp_trachea_left_pull', 'palp_exp_dec_left', 'palp_frem_dec_left', 'perc_dull_left', 'ausc_absent_left', 'ausc_vr_dec_left'],
         ippaTable: {
           inspection: 'Reduced left chest wall movement',
           palpation_trachea: 'Trachea shifted to the LEFT (Pulled toward collapse)',
@@ -253,12 +241,12 @@
         }
       },
       {
-        id: 'atelectasis_rll',
-        name: 'Right Lower Lobe Atelectasis',
-        shortTag: 'Lobar Collapse / Bronchial Obstruction',
-        graphicType: 'atelectasis_rll',
-        pathophysiology: 'Obstruction of the right lower lobe bronchus leads to alveolar gas resorption and lobar volume loss, pulling the trachea rightward, causing reduced right expansion, dullness over the right lower zone, and absent breath sounds due to airway occlusion.',
-        findingIds: ['palp_trachea_right_pull', 'palp_exp_dec_right', 'palp_frem_dec_rll', 'perc_dull_rll', 'ausc_absent_rll', 'ausc_vr_dec_rll'],
+        id: 'atelectasis_right',
+        name: 'Right Lung Atelectasis',
+        shortTag: 'Lung Collapse / Obstruction',
+        graphicType: 'atelectasis_right',
+        pathophysiology: 'Obstruction of a right bronchus leads to alveolar gas resorption and volume loss, pulling the trachea rightward, causing reduced right expansion, dullness, and absent breath sounds due to airway occlusion.',
+        findingIds: ['palp_trachea_right_pull', 'palp_exp_dec_right', 'palp_frem_dec_right', 'perc_dull_right', 'ausc_absent_right', 'ausc_vr_dec_right'],
         ippaTable: {
           inspection: 'Reduced right chest wall movement',
           palpation_trachea: 'Trachea shifted to the RIGHT (Pulled toward collapse)',
@@ -331,13 +319,9 @@
       }
 
       // Trachea shift (Patient Right = Viewer Left, Patient Left = Viewer Right)
-      // pneumothorax_right pushes Left (viewer Right: +12)
-      // effusion_left pushes Right (viewer Left: -12)
-      // atelectasis_lul pulls Left (viewer Right: +12)
-      // atelectasis_rll pulls Right (viewer Left: -12)
       const tracheaShift = mystery ? 0 : 
-        (type === 'pneumothorax_right' || type === 'atelectasis_lul') ? 12 : 
-        (type === 'effusion_left' || type === 'pneumothorax_left' || type === 'atelectasis_rll') ? -12 : 
+        (type === 'pneumothorax_right' || type === 'effusion_right' || type === 'atelectasis_left') ? 12 : 
+        (type === 'effusion_left' || type === 'pneumothorax_left' || type === 'atelectasis_right') ? -12 : 
         0;
 
       const svgHeight = size === 'small' ? 150 : 240;
@@ -352,7 +336,7 @@
           <svg viewBox="0 0 260 210" className="w-full" style={{ maxHeight: svgHeight }} fill="none" xmlns="http://www.w3.org/2000/svg">
             
             {/* Right Pleural Cavity (Viewer Left) */}
-            <path d="M115 58 C82 55, 42 80, 38 140 C36 172, 60 185, 112 175 C118 173, 120 155, 118 115 Z" fill={!mystery && type === 'pneumothorax_right' ? '#E2F1FF' : '#FFF5F5'} stroke="#5A3825" strokeWidth="3.5" strokeDasharray={!mystery && type === 'pneumothorax_right' ? '5 3' : 'none'} />
+            <path d="M115 58 C82 55, 42 80, 38 140 C36 172, 60 185, 112 175 C118 173, 120 155, 118 115 Z" fill={!mystery && type === 'pneumothorax_right' ? '#E2F1FF' : (!mystery && type === 'effusion_right' ? '#BEE3F8' : '#FFF5F5')} stroke="#5A3825" strokeWidth="3.5" strokeDasharray={!mystery && type === 'pneumothorax_right' ? '5 3' : 'none'} />
             
             {/* Left Pleural Cavity (Viewer Right) */}
             <path d="M145 58 C178 55, 218 80, 222 140 C224 172, 200 185, 148 175 C142 173, 140 155, 142 115 Z" fill={!mystery && type === 'pneumothorax_left' ? '#E2F1FF' : (!mystery && type === 'effusion_left' ? '#BEE3F8' : '#FFF5F5')} stroke="#5A3825" strokeWidth="3.5" strokeDasharray={!mystery && type === 'pneumothorax_left' ? '5 3' : 'none'} />
@@ -371,8 +355,8 @@
               <path d="M125 63 L100 84" stroke="#F6C29F" strokeWidth="4" strokeLinecap="round" />
               <path d="M135 63 L160 84" stroke="#F6C29F" strokeWidth="4" strokeLinecap="round" />
               
-              {!mystery && type === 'atelectasis_rll' && <circle cx="108" cy="77" r="5" fill="#E53E3E" />}
-              {!mystery && type === 'atelectasis_lul' && <circle cx="152" cy="77" r="5" fill="#E53E3E" />}
+              {!mystery && type === 'atelectasis_right' && <circle cx="108" cy="77" r="5" fill="#E53E3E" />}
+              {!mystery && type === 'atelectasis_left' && <circle cx="152" cy="77" r="5" fill="#E53E3E" />}
             </g>
 
             {/* Trachea Shift Arrow Indicator */}
@@ -392,27 +376,26 @@
                 <path d="M55 140 L75 135" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
                 <text x="90" y="122" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
               </g>
-            ) : !mystery && type === 'atelectasis_rll' ? (
+            ) : !mystery && type === 'atelectasis_right' ? (
               <g>
-                {/* Collapsed right lower lobe */}
-                <path d="M115 62 C85 60, 60 75, 55 100 C75 105, 100 110, 113 115 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
-                <path d="M55 100 C50 115, 60 145, 111 160 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
-                <text x="65" y="145" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
+                <path d="M115 62 C85 60, 60 75, 55 110 C75 115, 100 120, 113 115 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
+                <text x="55" y="145" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
               </g>
-            ) : !mystery && type === 'effusion_right_mod' ? (
+            ) : !mystery && type === 'effusion_right' ? (
               <g>
-                {/* Moderate effusion right */}
-                <path d="M115 62 C85 60, 46 84, 43 138 C41 150, 45 155, 60 155 C80 155, 100 160, 111 170 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
-                <path d="M43 138 C41 168, 63 180, 111 170 C100 160, 80 155, 60 155 C45 155, 41 150, 43 138 Z" fill="#63B3ED" stroke="#5A3825" strokeWidth="3" />
-                <text x="60" y="165" fill="#FFFDF9" fontSize="10" fontWeight="bold">FLUID</text>
+                {/* Massive effusion right */}
+                <path d="M115 66 C92 65, 68 82, 66 115 C80 125, 100 126, 115 120 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
+                <path d="M118 122 C95 132, 65 125, 42 110 C38 138, 42 175, 112 174 C118 172, 119 150, 118 122 Z" fill="#63B3ED" stroke="#5A3825" strokeWidth="3" />
+                <text x="60" y="156" fill="#FFFDF9" fontSize="11" fontWeight="bold">FLUID</text>
+                <text x="88" y="100" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
               </g>
             ) : (
               <g>
                 <path d={!mystery && type === 'asthma_severe' ? "M116 55 C80 50, 35 78, 33 144 C31 178, 58 190, 114 178 Z" : "M115 62 C85 60, 46 84, 43 138 C41 168, 63 180, 111 170 Z"} fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
-                {!mystery && type === 'consolidation_right_upper' && (
+                {!mystery && type === 'consolidation_right' && (
                   <g>
-                    <path d="M115 62 C85 60, 50 75, 48 95 C75 105, 100 100, 113 115 Z" fill="#D69E2E" opacity="0.85" stroke="#5A3825" strokeWidth="3" />
-                    <text x="65" y="85" fill="#5A3825" fontSize="9" fontWeight="bold">EXUDATE</text>
+                    <path d="M112 122 C88 115, 58 120, 45 136 C43 166, 65 178, 111 169 Z" fill="#D69E2E" opacity="0.85" stroke="#5A3825" strokeWidth="3" />
+                    <text x="55" y="155" fill="#5A3825" fontSize="9.5" fontWeight="bold">EXUDATE</text>
                   </g>
                 )}
                 {/* Face */}
@@ -438,12 +421,10 @@
                 <path d="M205 140 L185 135" stroke="#2B6CB0" strokeWidth="2.5" strokeLinecap="round" />
                 <text x="155" y="122" fill="#5A3825" fontSize="11" fontWeight="bold">x_x</text>
               </g>
-            ) : !mystery && type === 'atelectasis_lul' ? (
+            ) : !mystery && type === 'atelectasis_left' ? (
               <g>
-                {/* Collapsed left upper lobe */}
-                <path d="M145 75 C160 100, 185 115, 215 110 C219 140, 197 180, 149 170 Z" fill="#F4A29E" stroke="#5A3825" strokeWidth="3.5" />
-                <path d="M145 62 C175 60, 200 75, 215 110 C185 115, 160 100, 145 75 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
-                <text x="155" y="90" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
+                <path d="M145 62 C175 60, 200 75, 205 110 C185 115, 160 120, 147 115 Z" fill="#E5989B" stroke="#5A3825" strokeWidth="3.5" />
+                <text x="155" y="145" fill="#5A3825" fontSize="10" fontWeight="bold">COLLAPSE</text>
               </g>
             ) : (
               <g>
@@ -500,16 +481,16 @@
     // ==========================================
     function App() {
       const [diseases, setDiseases] = useState(() => {
-        try { const saved = localStorage.getItem('resp_pe_diseases_v3'); return saved ? JSON.parse(saved) : DEFAULT_DISEASES; } catch (e) { return DEFAULT_DISEASES; }
+        try { const saved = localStorage.getItem('resp_pe_diseases_v4'); return saved ? JSON.parse(saved) : DEFAULT_DISEASES; } catch (e) { return DEFAULT_DISEASES; }
       });
       const [findings, setFindings] = useState(() => {
-        try { const saved = localStorage.getItem('resp_pe_findings_v3'); return saved ? JSON.parse(saved) : DEFAULT_FINDINGS; } catch (e) { return DEFAULT_FINDINGS; }
+        try { const saved = localStorage.getItem('resp_pe_findings_v4'); return saved ? JSON.parse(saved) : DEFAULT_FINDINGS; } catch (e) { return DEFAULT_FINDINGS; }
       });
 
       useEffect(() => {
         try {
-          localStorage.setItem('resp_pe_diseases_v3', JSON.stringify(diseases));
-          localStorage.setItem('resp_pe_findings_v3', JSON.stringify(findings));
+          localStorage.setItem('resp_pe_diseases_v4', JSON.stringify(diseases));
+          localStorage.setItem('resp_pe_findings_v4', JSON.stringify(findings));
         } catch (e) {}
       }, [diseases, findings]);
 
@@ -654,8 +635,8 @@
         if (window.confirm('Restore factory default 10 diseases and findings?')) {
           setDiseases(DEFAULT_DISEASES);
           setFindings(DEFAULT_FINDINGS);
-          localStorage.removeItem('resp_pe_diseases_v3');
-          localStorage.removeItem('resp_pe_findings_v3');
+          localStorage.removeItem('resp_pe_diseases_v4');
+          localStorage.removeItem('resp_pe_findings_v4');
         }
       };
 
@@ -1100,16 +1081,16 @@
                                 }
                                 className="w-full border-2 border-[#5A3825] rounded-xl px-3 py-1.5 text-xs bg-white"
                               >
-                                <option value="consolidation_left">Left Lower Lung Consolidation</option>
-                                <option value="consolidation_right_upper">Right Upper Lung Consolidation</option>
+                                <option value="consolidation_left">Left Lung Consolidation</option>
+                                <option value="consolidation_right">Right Lung Consolidation</option>
                                 <option value="pneumothorax_right">Right Tension Pneumothorax</option>
                                 <option value="pneumothorax_left">Left Tension Pneumothorax</option>
                                 <option value="effusion_left">Massive Left Pleural Effusion</option>
-                                <option value="effusion_right_mod">Right Pleural Effusion (Moderate)</option>
+                                <option value="effusion_right">Massive Right Pleural Effusion</option>
                                 <option value="edema_bilat">Bilateral Pulmonary Edema</option>
                                 <option value="asthma_severe">Severe Asthmatic Attack</option>
-                                <option value="atelectasis_lul">Left Upper Lobe Atelectasis</option>
-                                <option value="atelectasis_rll">Right Lower Lobe Atelectasis</option>
+                                <option value="atelectasis_left">Left Lung Atelectasis</option>
+                                <option value="atelectasis_right">Right Lung Atelectasis</option>
                               </select>
                             </div>
                             <div>
